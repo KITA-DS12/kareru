@@ -5,15 +5,30 @@ import (
 	"time"
 )
 
-type TimeSlotManager struct{}
+type TimeSlotManager struct {
+	businessHours BusinessHours
+}
 
 type ManagedTimeSlot struct {
 	StartTime time.Time
 	EndTime   time.Time
 }
 
+type BusinessHours struct {
+	Start time.Time
+	End   time.Time
+}
+
 func NewTimeSlotManager() *TimeSlotManager {
-	return &TimeSlotManager{}
+	defaultStart := time.Date(2024, 1, 1, 9, 0, 0, 0, time.UTC)
+	defaultEnd := time.Date(2024, 1, 1, 18, 0, 0, 0, time.UTC)
+	
+	return &TimeSlotManager{
+		businessHours: BusinessHours{
+			Start: defaultStart,
+			End:   defaultEnd,
+		},
+	}
 }
 
 func (tsm *TimeSlotManager) GenerateSlots(start, end time.Time, interval time.Duration) []ManagedTimeSlot {
