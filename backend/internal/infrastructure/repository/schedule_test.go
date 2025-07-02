@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"os"
 	"testing"
 	"time"
 
@@ -20,7 +21,18 @@ import (
 // 6. スケジュールの更新が成功すること
 // 7. スケジュールの削除が成功すること
 
+// setupTestEnvironment はテスト実行前の環境設定を行う
+func setupTestEnvironment() {
+	// ローカルテスト実行時にFirestoreエミュレータを使用
+	if os.Getenv("FIRESTORE_EMULATOR_HOST") == "" {
+		os.Setenv("FIRESTORE_EMULATOR_HOST", "localhost:8081")
+	}
+}
+
 func TestScheduleRepository_Create(t *testing.T) {
+	// テスト環境でFirestoreエミュレータを使用
+	setupTestEnvironment()
+	
 	ctx := context.Background()
 	client, err := firestore.NewClient(ctx)
 	require.NoError(t, err)
@@ -48,6 +60,9 @@ func TestScheduleRepository_Create(t *testing.T) {
 }
 
 func TestScheduleRepository_GetByID(t *testing.T) {
+	// テスト環境でFirestoreエミュレータを使用
+	setupTestEnvironment()
+	
 	ctx := context.Background()
 	client, err := firestore.NewClient(ctx)
 	require.NoError(t, err)
@@ -81,6 +96,9 @@ func TestScheduleRepository_GetByID(t *testing.T) {
 }
 
 func TestScheduleRepository_GetByID_NotFound(t *testing.T) {
+	// テスト環境でFirestoreエミュレータを使用
+	setupTestEnvironment()
+	
 	ctx := context.Background()
 	client, err := firestore.NewClient(ctx)
 	require.NoError(t, err)
