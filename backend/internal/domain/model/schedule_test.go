@@ -229,3 +229,65 @@ func TestNewSchedule(t *testing.T) {
 		assert.WithinDuration(t, expectedExpiry, schedule.ExpiresAt, 1*time.Second)
 	})
 }
+
+func TestSchedule_CanEdit(t *testing.T) {
+	t.Run("有効なスケジュールは編集可能", func(t *testing.T) {
+		schedule := &Schedule{
+			CreatedAt: time.Now().Add(-1 * time.Hour),
+			ExpiresAt: time.Now().Add(1 * time.Hour),
+		}
+		
+		assert.True(t, schedule.CanEdit())
+	})
+	
+	t.Run("失効したスケジュールは編集不可", func(t *testing.T) {
+		schedule := &Schedule{
+			CreatedAt: time.Now().Add(-8 * 24 * time.Hour),
+			ExpiresAt: time.Now().Add(-1 * time.Hour),
+		}
+		
+		assert.False(t, schedule.CanEdit())
+	})
+}
+
+func TestSchedule_GetStatusLabel(t *testing.T) {
+	t.Run("有効なスケジュールのラベルは空", func(t *testing.T) {
+		schedule := &Schedule{
+			CreatedAt: time.Now().Add(-1 * time.Hour),
+			ExpiresAt: time.Now().Add(1 * time.Hour),
+		}
+		
+		assert.Equal(t, "", schedule.GetStatusLabel())
+	})
+	
+	t.Run("失効したスケジュールのラベルは期限切れ", func(t *testing.T) {
+		schedule := &Schedule{
+			CreatedAt: time.Now().Add(-8 * 24 * time.Hour),
+			ExpiresAt: time.Now().Add(-1 * time.Hour),
+		}
+		
+		assert.Equal(t, "期限切れ", schedule.GetStatusLabel())
+	})
+}
+
+func TestSchedule_GetDaysUntilExpiry(t *testing.T) {
+	t.Run("有効期限まで3日の場合", func(t *testing.T) {
+		schedule := &Schedule{
+			CreatedAt: time.Now().Add(-4 * 24 * time.Hour),
+			ExpiresAt: time.Now().Add(3 * 24 * time.Hour),
+		}
+		
+		days := schedule.GetDaysUntilExpiry()
+		assert.Equal(t, 3, days)
+	})
+	
+	t.Run("失効したスケジュールは0日", func(t *testing.T) {
+		schedule := &Schedule{
+			CreatedAt: time.Now().Add(-8 * 24 * time.Hour),
+			ExpiresAt: time.Now().Add(-1 * time.Hour),
+		}
+		
+		days := schedule.GetDaysUntilExpiry()
+		assert.Equal(t, 0, days)
+	})
+}

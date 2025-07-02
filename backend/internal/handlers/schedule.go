@@ -312,6 +312,14 @@ func (h *ScheduleHandler) DeleteSchedule(c *gin.Context) {
 		return
 	}
 
+	// 失効チェック
+	if schedule.IsExpired() {
+		c.JSON(http.StatusGone, gin.H{
+			"error": "schedule has expired",
+		})
+		return
+	}
+
 	// 編集トークンの検証
 	if err := schedule.VerifyEditToken(req.EditToken); err != nil {
 		c.JSON(http.StatusForbidden, gin.H{
