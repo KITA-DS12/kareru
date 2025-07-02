@@ -115,8 +115,11 @@ func (s *Schedule) GetDaysUntilExpiry() int {
 	if s.IsExpired() {
 		return 0
 	}
-	duration := time.Until(s.ExpiresAt)
-	days := int(duration.Hours()/24) + 1 // 切り上げ処理
+	
+	now := time.Now()
+	duration := s.ExpiresAt.Sub(now)
+	days := int(duration.Hours()/24) + 1
+	
 	if days < 0 {
 		return 0
 	}
