@@ -57,3 +57,7 @@ func (mts ManagedTimeSlot) Format() string {
 		mts.StartTime.Hour(), mts.StartTime.Minute(),
 		mts.EndTime.Hour(), mts.EndTime.Minute())
 }
+
+func (tsm *TimeSlotManager) CheckOverlap(slot1, slot2 ManagedTimeSlot) bool {
+	return slot1.StartTime.Before(slot2.EndTime) && slot2.StartTime.Before(slot1.EndTime)
+}

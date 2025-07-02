@@ -55,3 +55,49 @@ func TestTimeSlotManager_GenerateSlots(t *testing.T) {
 		assert.Equal(t, "09:00-15:00", slots[0].Format())
 	})
 }
+
+func TestTimeSlotManager_CheckOverlap(t *testing.T) {
+	manager := NewTimeSlotManager()
+	
+	t.Run("完全に重複するスロット", func(t *testing.T) {
+		slot1 := ManagedTimeSlot{
+			StartTime: time.Date(2024, 1, 1, 9, 0, 0, 0, time.UTC),
+			EndTime:   time.Date(2024, 1, 1, 10, 0, 0, 0, time.UTC),
+		}
+		slot2 := ManagedTimeSlot{
+			StartTime: time.Date(2024, 1, 1, 9, 0, 0, 0, time.UTC),
+			EndTime:   time.Date(2024, 1, 1, 10, 0, 0, 0, time.UTC),
+		}
+		
+		hasOverlap := manager.CheckOverlap(slot1, slot2)
+		assert.True(t, hasOverlap)
+	})
+	
+	t.Run("部分的に重複するスロット", func(t *testing.T) {
+		slot1 := ManagedTimeSlot{
+			StartTime: time.Date(2024, 1, 1, 9, 0, 0, 0, time.UTC),
+			EndTime:   time.Date(2024, 1, 1, 10, 30, 0, 0, time.UTC),
+		}
+		slot2 := ManagedTimeSlot{
+			StartTime: time.Date(2024, 1, 1, 10, 0, 0, 0, time.UTC),
+			EndTime:   time.Date(2024, 1, 1, 11, 0, 0, 0, time.UTC),
+		}
+		
+		hasOverlap := manager.CheckOverlap(slot1, slot2)
+		assert.True(t, hasOverlap)
+	})
+	
+	t.Run("重複しないスロット", func(t *testing.T) {
+		slot1 := ManagedTimeSlot{
+			StartTime: time.Date(2024, 1, 1, 9, 0, 0, 0, time.UTC),
+			EndTime:   time.Date(2024, 1, 1, 10, 0, 0, 0, time.UTC),
+		}
+		slot2 := ManagedTimeSlot{
+			StartTime: time.Date(2024, 1, 1, 10, 0, 0, 0, time.UTC),
+			EndTime:   time.Date(2024, 1, 1, 11, 0, 0, 0, time.UTC),
+		}
+		
+		hasOverlap := manager.CheckOverlap(slot1, slot2)
+		assert.False(t, hasOverlap)
+	})
+}
