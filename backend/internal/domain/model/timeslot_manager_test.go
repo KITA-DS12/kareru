@@ -101,3 +101,39 @@ func TestTimeSlotManager_CheckOverlap(t *testing.T) {
 		assert.False(t, hasOverlap)
 	})
 }
+
+func TestTimeSlotManager_FilterBusinessHours(t *testing.T) {
+	manager := NewTimeSlotManager()
+	
+	t.Run("営業時間内のスロットは維持", func(t *testing.T) {
+		slots := []ManagedTimeSlot{
+			{
+				StartTime: time.Date(2024, 1, 1, 10, 0, 0, 0, time.UTC),
+				EndTime:   time.Date(2024, 1, 1, 11, 0, 0, 0, time.UTC),
+			},
+			{
+				StartTime: time.Date(2024, 1, 1, 14, 0, 0, 0, time.UTC),
+				EndTime:   time.Date(2024, 1, 1, 15, 0, 0, 0, time.UTC),
+			},
+		}
+		
+		filtered := manager.FilterBusinessHours(slots)
+		assert.Equal(t, 2, len(filtered))
+	})
+	
+	t.Run("営業時間外のスロットは除外", func(t *testing.T) {
+		slots := []ManagedTimeSlot{
+			{
+				StartTime: time.Date(2024, 1, 1, 8, 0, 0, 0, time.UTC),
+				EndTime:   time.Date(2024, 1, 1, 9, 0, 0, 0, time.UTC),
+			},
+			{
+				StartTime: time.Date(2024, 1, 1, 18, 0, 0, 0, time.UTC),
+				EndTime:   time.Date(2024, 1, 1, 19, 0, 0, 0, time.UTC),
+			},
+		}
+		
+		filtered := manager.FilterBusinessHours(slots)
+		assert.Equal(t, 0, len(filtered))
+	})
+}
