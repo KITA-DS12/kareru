@@ -1,11 +1,13 @@
 import { useState } from 'react'
-import { TimeSlot, Schedule } from '../types/schedule'
+import { TimeSlot, Schedule, CreateScheduleResponse } from '../types/schedule'
+import { createSchedule } from '../services/api'
 
 export function useScheduleForm() {
   const [comment, setComment] = useState('')
   const [timeSlots, setTimeSlots] = useState<TimeSlot[]>([])
   const [error, setError] = useState('')
   const [isLoading, setIsLoading] = useState(false)
+  const [successData, setSuccessData] = useState<CreateScheduleResponse | null>(null)
 
   const addTimeSlot = () => {
     const newSlot: TimeSlot = {
@@ -48,11 +50,35 @@ export function useScheduleForm() {
     return true
   }
 
+  const submitForm = async (): Promise<boolean> => {
+    if (!validateForm()) {
+      return false
+    }
+
+    setIsLoading(true)
+    setError('')
+
+    try {
+      const response = await createSchedule({
+        comment,
+        timeSlots,
+      })
+      setSuccessData(response)
+      return true
+    } catch (error) {
+      setError('スケジュールの作成に失敗しました')
+      return false
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
   const resetForm = () => {
     setComment('')
     setTimeSlots([])
     setError('')
     setIsLoading(false)
+    setSuccessData(null)
   }
 
   return {
@@ -61,11 +87,13 @@ export function useScheduleForm() {
     timeSlots,
     error,
     isLoading,
+    successData,
     setIsLoading,
     addTimeSlot,
     removeTimeSlot,
     updateTimeSlot,
     validateForm,
+    submitForm,
     resetForm,
   }
 }
