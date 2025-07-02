@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   backend:
     build:
@@ -13,6 +11,9 @@ services:
     command: go run cmd/server/main.go
     environment:
       - GIN_MODE=debug
+      - FIRESTORE_EMULATOR_HOST=firestore:8081
+    depends_on:
+      - firestore
 
   frontend:
     build:
@@ -27,3 +28,12 @@ services:
     command: npm run dev
     depends_on:
       - backend
+
+  firestore:
+    image: gcr.io/google.com/cloudsdktool/cloud-sdk:455.0.0-emulators
+    ports:
+      - "8081:8081"
+      - "4001:4001"
+    command: gcloud emulators firestore start --host-port=0.0.0.0:8081
+    environment:
+      - FIRESTORE_PROJECT_ID=kareru-local

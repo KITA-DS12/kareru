@@ -76,6 +76,14 @@ dev-backend: ## バックエンドの開発サーバーを起動（ローカル�
 dev-frontend: ## フロントエンドの開発サーバーを起動（ローカル）
 	cd frontend && npm run dev
 
+.PHONY: firestore-logs
+firestore-logs: ## Firestoreエミュレータのログを表示
+	docker-compose logs -f firestore
+
+.PHONY: seed
+seed: ## テストデータをFirestoreに投入
+	cd backend && FIRESTORE_EMULATOR_HOST=localhost:8081 go run cmd/seed/main.go
+
 # セットアップ
 .PHONY: setup
 setup: setup-backend setup-frontend ## 開発環境をセットアップ
