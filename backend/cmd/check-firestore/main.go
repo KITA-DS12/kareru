@@ -11,20 +11,20 @@ import (
 
 func main() {
 	ctx := context.Background()
-	
+
 	client, err := firestore.NewClient(ctx)
 	if err != nil {
 		log.Fatalf("Firestoreクライアント作成に失敗: %v", err)
 	}
 	defer client.Close()
-	
+
 	repo := repository.NewScheduleRepository(client)
-	
+
 	// スケジュール一覧を取得
 	fmt.Println("=== Firestoreエミュレータのデータ確認 ===")
-	
+
 	scheduleIDs := []string{"sample-schedule-1", "sample-schedule-2"}
-	
+
 	for _, id := range scheduleIDs {
 		schedule, err := repo.GetByID(ctx, id)
 		if err != nil {

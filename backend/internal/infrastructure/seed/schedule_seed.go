@@ -11,9 +11,9 @@ import (
 
 func SeedSchedules(ctx context.Context, client *firestore.Client) error {
 	repo := repository.NewScheduleRepository(client)
-	
+
 	now := time.Now()
-	
+
 	schedules := []*model.Schedule{
 		{
 			ID:        "sample-schedule-1",
@@ -49,12 +49,12 @@ func SeedSchedules(ctx context.Context, client *firestore.Client) error {
 			ExpiresAt: now.Add(7 * 24 * time.Hour),
 		},
 	}
-	
+
 	for _, schedule := range schedules {
 		if err := repo.Create(ctx, schedule); err != nil {
 			return err
 		}
 	}
-	
+
 	return nil
 }

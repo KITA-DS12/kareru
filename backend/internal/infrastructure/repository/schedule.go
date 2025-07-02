@@ -58,18 +58,18 @@ func (r *ScheduleRepository) convertTimeSlotsToFirestore(slots []model.TimeSlot)
 
 func (r *ScheduleRepository) convertFirestoreToSchedule(data map[string]interface{}) (*model.Schedule, error) {
 	schedule := &model.Schedule{}
-	
+
 	if id, ok := data["id"].(string); ok {
 		schedule.ID = id
 	}
-	
+
 	if editToken, ok := data["editToken"].(string); ok {
 		schedule.EditToken = editToken
 	}
-	
+
 	if comment, ok := data["comment"].(string); ok {
 		schedule.Comment = comment
 	}
-	
+
 	return schedule, nil
 }
