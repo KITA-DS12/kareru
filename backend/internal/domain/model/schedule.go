@@ -97,6 +97,32 @@ func (s *Schedule) IsExpired() bool {
 	return time.Now().After(s.ExpiresAt)
 }
 
+// CanEdit checks if the schedule can be edited (not expired)
+func (s *Schedule) CanEdit() bool {
+	return !s.IsExpired()
+}
+
+// GetStatusLabel returns a status label for the schedule
+func (s *Schedule) GetStatusLabel() string {
+	if s.IsExpired() {
+		return "期限切れ"
+	}
+	return ""
+}
+
+// GetDaysUntilExpiry returns the number of days until expiry (0 if expired)
+func (s *Schedule) GetDaysUntilExpiry() int {
+	if s.IsExpired() {
+		return 0
+	}
+	duration := time.Until(s.ExpiresAt)
+	days := int(duration.Hours()/24) + 1 // 切り上げ処理
+	if days < 0 {
+		return 0
+	}
+	return days
+}
+
 // NewSchedule creates a new schedule with generated ID and edit token
 func NewSchedule() (*Schedule, error) {
 	id, err := GenerateUUID()
