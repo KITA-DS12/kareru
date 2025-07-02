@@ -1,56 +1,25 @@
 'use client'
 
-import { useState } from 'react'
-
-interface TimeSlot {
-  id: string
-  startTime: string
-  endTime: string
-}
+import { useScheduleForm } from '../hooks/useScheduleForm'
 
 export default function ScheduleForm() {
-  const [comment, setComment] = useState('')
-  const [timeSlots, setTimeSlots] = useState<TimeSlot[]>([])
-  const [error, setError] = useState('')
-
-  const addTimeSlot = () => {
-    const newSlot: TimeSlot = {
-      id: Date.now().toString(),
-      startTime: '',
-      endTime: ''
-    }
-    setTimeSlots([...timeSlots, newSlot])
-  }
-
-  const removeTimeSlot = (id: string) => {
-    setTimeSlots(timeSlots.filter(slot => slot.id !== id))
-  }
-
-  const updateTimeSlot = (id: string, field: 'startTime' | 'endTime', value: string) => {
-    setTimeSlots(timeSlots.map(slot =>
-      slot.id === id ? { ...slot, [field]: value } : slot
-    ))
-  }
+  const {
+    comment,
+    setComment,
+    timeSlots,
+    error,
+    isLoading,
+    addTimeSlot,
+    removeTimeSlot,
+    updateTimeSlot,
+    validateForm,
+  } = useScheduleForm()
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    setError('')
-
-    if (timeSlots.length === 0) {
-      setError('時間スロットを追加してください')
+    
+    if (!validateForm()) {
       return
-    }
-
-    // バリデーション
-    for (const slot of timeSlots) {
-      if (!slot.startTime || !slot.endTime) {
-        setError('全ての時間スロットを入力してください')
-        return
-      }
-      if (slot.startTime >= slot.endTime) {
-        setError('開始時刻は終了時刻より前に設定してください')
-        return
-      }
     }
 
     // フォーム送信処理（後で実装）
