@@ -45,4 +45,4 @@ vendor/
 
 # Build artifacts
 dist/
-build/
+build/coverage.out
