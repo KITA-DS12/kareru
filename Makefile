@@ -41,7 +41,7 @@ test: test-backend test-frontend ## 全テストを実行
 
 .PHONY: test-backend
 test-backend: ## バックエンドのテストを実行
-	cd backend && go test -v ./...
+	cd backend && FIRESTORE_EMULATOR_HOST=localhost:8081 go test -v ./...
 
 .PHONY: test-frontend
 test-frontend: ## フロントエンドのテストを実行
@@ -49,6 +49,14 @@ test-frontend: ## フロントエンドのテストを実行
 
 .PHONY: test-all
 test-all: test ## 全テストを実行（エイリアス）
+
+.PHONY: test-backend-unit
+test-backend-unit: ## バックエンドの単体テストのみ実行
+	cd backend && FIRESTORE_EMULATOR_HOST=localhost:8081 go test -v ./internal/handlers/... ./internal/domain/...
+
+.PHONY: test-backend-integration
+test-backend-integration: ## バックエンドの統合テストのみ実行
+	cd backend && FIRESTORE_EMULATOR_HOST=localhost:8081 go test -v ./internal/infrastructure/... ./internal/routes/...
 
 # Lint関連
 .PHONY: lint
