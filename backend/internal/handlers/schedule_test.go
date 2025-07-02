@@ -178,8 +178,35 @@ func TestGetSchedule(t *testing.T) {
 	})
 
 	t.Run("失効したスケジュールで410エラーを返す", func(t *testing.T) {
-		// 実装前のため一時的にスキップ
-		t.Skip("実装前のため一時的にスキップ")
+		router := gin.New()
+		mockRepo := NewMockScheduleRepository()
+		handler := NewScheduleHandler(mockRepo)
+		
+		// 失効したテスト用のスケジュールを事前に作成
+		expiredSchedule := &model.Schedule{
+			ID:        "expired-uuid-123",
+			EditToken: "expired-token",
+			Comment:   "失効したスケジュール",
+			CreatedAt: time.Now().Add(-8 * 24 * time.Hour),
+			ExpiresAt: time.Now().Add(-1 * time.Hour), // 1時間前に失効
+			TimeSlots: []model.TimeSlot{},
+		}
+		mockRepo.schedules[expiredSchedule.ID] = expiredSchedule
+		
+		router.GET("/schedules/:uuid", handler.GetSchedule)
+
+		req := httptest.NewRequest(http.MethodGet, "/schedules/expired-uuid-123", nil)
+		w := httptest.NewRecorder()
+
+		router.ServeHTTP(w, req)
+
+		// 410 Gone エラーが返されることを確認
+		assert.Equal(t, http.StatusGone, w.Code)
+		
+		var response map[string]interface{}
+		err := json.Unmarshal(w.Body.Bytes(), &response)
+		assert.NoError(t, err)
+		assert.Contains(t, response["error"], "schedule has expired")
 	})
 }
 
@@ -250,8 +277,43 @@ func TestUpdateSchedule(t *testing.T) {
 	})
 
 	t.Run("失効したスケジュールで410エラーを返す", func(t *testing.T) {
-		// 実装前のため一時的にスキップ
-		t.Skip("実装前のため一時的にスキップ")
+		router := gin.New()
+		mockRepo := NewMockScheduleRepository()
+		handler := NewScheduleHandler(mockRepo)
+		
+		// 失効したテスト用のスケジュールを事前に作成
+		expiredSchedule := &model.Schedule{
+			ID:        "expired-uuid-456",
+			EditToken: "expired-token",
+			Comment:   "失効したスケジュール",
+			CreatedAt: time.Now().Add(-8 * 24 * time.Hour),
+			ExpiresAt: time.Now().Add(-1 * time.Hour), // 1時間前に失効
+			TimeSlots: []model.TimeSlot{},
+		}
+		mockRepo.schedules[expiredSchedule.ID] = expiredSchedule
+		
+		router.PUT("/schedules/:uuid", handler.UpdateSchedule)
+
+		reqBody := UpdateScheduleRequest{
+			EditToken: "expired-token",
+			TimeSlots: []TimeSlotRequest{},
+			Comment:   "更新を試行",
+		}
+
+		body, _ := json.Marshal(reqBody)
+		req := httptest.NewRequest(http.MethodPut, "/schedules/expired-uuid-456", bytes.NewBuffer(body))
+		req.Header.Set("Content-Type", "application/json")
+		w := httptest.NewRecorder()
+
+		router.ServeHTTP(w, req)
+
+		// 410 Gone エラーが返されることを確認
+		assert.Equal(t, http.StatusGone, w.Code)
+		
+		var response map[string]interface{}
+		err := json.Unmarshal(w.Body.Bytes(), &response)
+		assert.NoError(t, err)
+		assert.Contains(t, response["error"], "schedule has expired")
 	})
 
 	t.Run("無効なタイムスロットで400エラーを返す", func(t *testing.T) {
@@ -313,6 +375,44 @@ func TestDeleteSchedule(t *testing.T) {
 	t.Run("存在しないUUIDで404エラーを返す", func(t *testing.T) {
 		// 実装前のため一時的にスキップ
 		t.Skip("実装前のため一時的にスキップ")
+	})
+	
+	t.Run("失効したスケジュールで410エラーを返す", func(t *testing.T) {
+		router := gin.New()
+		mockRepo := NewMockScheduleRepository()
+		handler := NewScheduleHandler(mockRepo)
+		
+		// 失効したテスト用のスケジュールを事前に作成
+		expiredSchedule := &model.Schedule{
+			ID:        "expired-uuid-789",
+			EditToken: "expired-token",
+			Comment:   "失効したスケジュール",
+			CreatedAt: time.Now().Add(-8 * 24 * time.Hour),
+			ExpiresAt: time.Now().Add(-1 * time.Hour), // 1時間前に失効
+			TimeSlots: []model.TimeSlot{},
+		}
+		mockRepo.schedules[expiredSchedule.ID] = expiredSchedule
+		
+		router.DELETE("/schedules/:uuid", handler.DeleteSchedule)
+
+		reqBody := DeleteScheduleRequest{
+			EditToken: "expired-token",
+		}
+
+		body, _ := json.Marshal(reqBody)
+		req := httptest.NewRequest(http.MethodDelete, "/schedules/expired-uuid-789", bytes.NewBuffer(body))
+		req.Header.Set("Content-Type", "application/json")
+		w := httptest.NewRecorder()
+
+		router.ServeHTTP(w, req)
+
+		// 410 Gone エラーが返されることを確認
+		assert.Equal(t, http.StatusGone, w.Code)
+		
+		var response map[string]interface{}
+		err := json.Unmarshal(w.Body.Bytes(), &response)
+		assert.NoError(t, err)
+		assert.Contains(t, response["error"], "schedule has expired")
 	})
 }
 
