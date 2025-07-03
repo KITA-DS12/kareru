@@ -22,7 +22,7 @@ export default function ScheduleForm() {
   }
 
   const generateUrl = (id: string) => {
-    return `${window.location.origin}/schedules/${id}`
+    return `${window.location.origin}/schedule/${id}`
   }
 
   const copyToClipboard = async (text: string) => {
