@@ -12,25 +12,53 @@ interface Props {
 
 export default function SchedulePage({ params }: Props) {
   const [schedule, setSchedule] = useState<Schedule | null>(null)
+  const [error, setError] = useState<string | null>(null)
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     const fetchSchedule = async () => {
       try {
+        setLoading(true)
         const data = await getSchedule(params.uuid)
         setSchedule(data)
+        setError(null)
       } catch (error) {
         console.error('Failed to fetch schedule:', error)
+        setError('スケジュールが見つかりませんでした')
+        setSchedule(null)
+      } finally {
+        setLoading(false)
       }
     }
 
     fetchSchedule()
   }, [params.uuid])
 
-  if (!schedule) {
+  if (loading) {
     return (
       <div data-testid="schedule-page">
         <h1>スケジュール表示</h1>
         <p>Loading...</p>
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div data-testid="schedule-page">
+        <h1>スケジュール表示</h1>
+        <div data-testid="error-message" className="bg-red-100 text-red-600 px-4 py-2 rounded">
+          {error}
+        </div>
+      </div>
+    )
+  }
+
+  if (!schedule) {
+    return (
+      <div data-testid="schedule-page">
+        <h1>スケジュール表示</h1>
+        <p>スケジュールが見つかりません</p>
       </div>
     )
   }

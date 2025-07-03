@@ -94,4 +94,17 @@ describe('SchedulePage', () => {
     
     expect(screen.queryByTestId('expired-label')).not.toBeInTheDocument()
   })
+
+  it('スケジュール未発見時にエラーメッセージを表示する', async () => {
+    mockGetSchedule.mockRejectedValue(new Error('Schedule not found'))
+    
+    const mockParams = { uuid: 'invalid-uuid' }
+    render(<SchedulePage params={mockParams} />)
+    
+    await waitFor(() => {
+      expect(screen.getByTestId('error-message')).toBeInTheDocument()
+    })
+    
+    expect(screen.getByText(/スケジュールが見つかりませんでした/)).toBeInTheDocument()
+  })
 })
