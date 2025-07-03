@@ -115,15 +115,15 @@ export default function SchedulePage({ params }: Props) {
                 <div key={index} className="flex items-center p-3 bg-gray-50 rounded-lg">
                   <div className="flex-1">
                     <span className="text-gray-700 font-medium">
-                      {formatTime(slot.startTime)} - {formatTime(slot.endTime)}
+                      {formatTime(slot.StartTime)} - {formatTime(slot.EndTime)}
                     </span>
                   </div>
                   <div className={`px-2 py-1 rounded text-xs font-medium ${
-                    slot.available 
+                    slot.Available 
                       ? 'bg-green-100 text-green-700' 
                       : 'bg-gray-100 text-gray-600'
                   }`}>
-                    {slot.available ? '利用可能' : '利用不可'}
+                    {slot.Available ? '利用可能' : '利用不可'}
                   </div>
                 </div>
               ))}
