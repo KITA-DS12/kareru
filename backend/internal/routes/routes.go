@@ -17,6 +17,14 @@ func SetupRoutes(router *gin.Engine, scheduleHandler *handlers.ScheduleHandler) 
 			schedules.GET("/:uuid", scheduleHandler.GetSchedule)
 			schedules.PUT("/:uuid", scheduleHandler.UpdateSchedule)
 			schedules.DELETE("/:uuid", scheduleHandler.DeleteSchedule)
+			
+			// 編集トークンベースのエンドポイント
+			edit := schedules.Group("/edit")
+			{
+				edit.GET("/:token", scheduleHandler.GetScheduleByEditToken)
+				edit.PUT("/:token", scheduleHandler.UpdateScheduleByEditToken)
+				edit.DELETE("/:token", scheduleHandler.DeleteScheduleByEditToken)
+			}
 		}
 	}
 
