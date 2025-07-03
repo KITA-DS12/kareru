@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { getScheduleByToken } from '../../../services/api'
+import { getScheduleByToken, updateSchedule } from '../../../services/api'
 import { Schedule } from '../../../types/schedule'
 
 interface Props {
@@ -14,6 +14,9 @@ export default function EditPage({ params }: Props) {
   const [schedule, setSchedule] = useState<Schedule | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
+  const [comment, setComment] = useState('')
+  const [timeSlots, setTimeSlots] = useState<Schedule['timeSlots']>([])
+  const [saving, setSaving] = useState(false)
 
   useEffect(() => {
     const fetchSchedule = async () => {
@@ -21,6 +24,8 @@ export default function EditPage({ params }: Props) {
         setLoading(true)
         const data = await getScheduleByToken(params.token)
         setSchedule(data)
+        setComment(data.comment)
+        setTimeSlots(data.timeSlots)
         setError(null)
       } catch (error) {
         console.error('Failed to fetch schedule by token:', error)
@@ -33,6 +38,30 @@ export default function EditPage({ params }: Props) {
 
     fetchSchedule()
   }, [params.token])
+
+  const handleSave = async () => {
+    if (!schedule) return
+
+    try {
+      setSaving(true)
+      await updateSchedule(params.token, {
+        comment,
+        timeSlots
+      })
+      // 成功通知などは後で実装
+    } catch (error) {
+      console.error('Failed to update schedule:', error)
+      setError('更新に失敗しました')
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  const toggleTimeSlot = (index: number) => {
+    setTimeSlots(prev => prev.map((slot, i) => 
+      i === index ? { ...slot, Available: !slot.Available } : slot
+    ))
+  }
 
   if (loading) {
     return (
@@ -66,15 +95,36 @@ export default function EditPage({ params }: Props) {
   return (
     <div data-testid="edit-page">
       <h1>スケジュール編集</h1>
-      <form data-testid="edit-form">
+      <form data-testid="edit-form" onSubmit={(e) => { e.preventDefault(); handleSave(); }}>
         <div>
           <label htmlFor="comment">コメント:</label>
           <input
             id="comment"
             type="text"
-            defaultValue={schedule.comment}
+            value={comment}
+            onChange={(e) => setComment(e.target.value)}
           />
         </div>
+        
+        <div data-testid="timeslot-list">
+          <h3>タイムスロット:</h3>
+          {timeSlots.map((slot, index) => (
+            <div key={index}>
+              <label>
+                <input
+                  type="checkbox"
+                  checked={slot.Available}
+                  onChange={() => toggleTimeSlot(index)}
+                />
+                {new Date(slot.StartTime).toLocaleTimeString()} - {new Date(slot.EndTime).toLocaleTimeString()}
+              </label>
+            </div>
+          ))}
+        </div>
+
+        <button type="submit" disabled={saving}>
+          {saving ? '保存中...' : '保存'}
+        </button>
       </form>
     </div>
   )
