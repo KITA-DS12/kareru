@@ -33,3 +33,46 @@ export async function getSchedule(id: string): Promise<Schedule> {
 
   return response.json()
 }
+
+export async function getScheduleByToken(token: string): Promise<Schedule> {
+  const response = await fetch(`${API_BASE_URL}/api/v1/schedules/edit/${token}`)
+
+  if (!response.ok) {
+    throw new Error(`HTTP error! status: ${response.status}`)
+  }
+
+  return response.json()
+}
+
+export async function updateSchedule(token: string, schedule: Omit<Schedule, 'id' | 'editToken' | 'createdAt' | 'expiresAt'>): Promise<Schedule> {
+  const response = await fetch(`${API_BASE_URL}/api/v1/schedules/edit/${token}`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      comment: schedule.comment,
+      timeSlots: schedule.timeSlots.map(slot => ({
+        startTime: slot.StartTime,
+        endTime: slot.EndTime,
+        available: slot.Available,
+      })),
+    }),
+  })
+
+  if (!response.ok) {
+    throw new Error(`HTTP error! status: ${response.status}`)
+  }
+
+  return response.json()
+}
+
+export async function deleteSchedule(token: string): Promise<void> {
+  const response = await fetch(`${API_BASE_URL}/api/v1/schedules/edit/${token}`, {
+    method: 'DELETE',
+  })
+
+  if (!response.ok) {
+    throw new Error(`HTTP error! status: ${response.status}`)
+  }
+}
