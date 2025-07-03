@@ -123,7 +123,7 @@ export default function SchedulePage({ params }: Props) {
                       ? 'bg-green-100 text-green-700' 
                       : 'bg-gray-100 text-gray-600'
                   }`}>
-                    {slot.Available ? '利用可能' : '利用不可'}
+                    {slot.Available ? '参加可能' : '参加不可'}
                   </div>
                 </div>
               ))}
