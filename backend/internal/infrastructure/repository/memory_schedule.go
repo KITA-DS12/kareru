@@ -60,3 +60,15 @@ func (r *MemoryScheduleRepository) Delete(id string) error {
 	delete(r.schedules, id)
 	return nil
 }
+
+func (r *MemoryScheduleRepository) GetByEditToken(token string) (*model.Schedule, error) {
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+	
+	for _, schedule := range r.schedules {
+		if schedule.EditToken == token {
+			return schedule, nil
+		}
+	}
+	return nil, fmt.Errorf("schedule not found")
+}

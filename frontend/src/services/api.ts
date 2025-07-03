@@ -1,8 +1,8 @@
-import { CreateScheduleResponse, Schedule } from '../types/schedule'
+import { CreateScheduleResponse, Schedule, FormSchedule } from '../types/schedule'
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080'
 
-export async function createSchedule(schedule: Omit<Schedule, 'id' | 'editToken' | 'createdAt' | 'expiresAt'>): Promise<CreateScheduleResponse> {
+export async function createSchedule(schedule: Omit<FormSchedule, 'id' | 'editToken' | 'createdAt' | 'expiresAt'>): Promise<CreateScheduleResponse> {
   const response = await fetch(`${API_BASE_URL}/api/v1/schedules`, {
     method: 'POST',
     headers: {
@@ -53,8 +53,8 @@ export async function updateSchedule(token: string, schedule: Omit<Schedule, 'id
     body: JSON.stringify({
       comment: schedule.comment,
       timeSlots: schedule.timeSlots.map(slot => ({
-        startTime: slot.StartTime,
-        endTime: slot.EndTime,
+        startTime: new Date(slot.StartTime).toISOString(),
+        endTime: new Date(slot.EndTime).toISOString(),
         available: slot.Available,
       })),
     }),

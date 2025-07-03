@@ -1,16 +1,16 @@
 import { useState } from 'react'
-import { TimeSlot, Schedule, CreateScheduleResponse } from '../types/schedule'
+import { FormTimeSlot, FormSchedule, CreateScheduleResponse } from '../types/schedule'
 import { createSchedule } from '../services/api'
 
 export function useScheduleForm() {
   const [comment, setComment] = useState('')
-  const [timeSlots, setTimeSlots] = useState<TimeSlot[]>([])
+  const [timeSlots, setTimeSlots] = useState<FormTimeSlot[]>([])
   const [error, setError] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [successData, setSuccessData] = useState<CreateScheduleResponse | null>(null)
 
   const addTimeSlot = () => {
-    const newSlot: TimeSlot = {
+    const newSlot: FormTimeSlot = {
       id: Date.now().toString(),
       startTime: '',
       endTime: ''

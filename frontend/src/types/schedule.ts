@@ -5,10 +5,25 @@ export interface TimeSlot {
   Available: boolean
 }
 
+export interface FormTimeSlot {
+  id?: string
+  startTime: string
+  endTime: string
+}
+
 export interface Schedule {
   id?: string
   comment: string
   timeSlots: TimeSlot[]
+  editToken?: string
+  createdAt?: string
+  expiresAt?: string
+}
+
+export interface FormSchedule {
+  id?: string
+  comment: string
+  timeSlots: FormTimeSlot[]
   editToken?: string
   createdAt?: string
   expiresAt?: string
