@@ -35,9 +35,16 @@ export default function SchedulePage({ params }: Props) {
     )
   }
 
+  const isExpired = new Date(schedule.expiresAt) < new Date()
+
   return (
     <div data-testid="schedule-page">
       <h1>スケジュール表示</h1>
+      {isExpired && (
+        <div data-testid="expired-label" className="bg-red-100 text-red-600 px-2 py-1 rounded">
+          期限切れ
+        </div>
+      )}
       <p>{schedule.comment}</p>
       <div data-testid="time-slot-list">
         {schedule.timeSlots.map((slot, index) => (

@@ -43,4 +43,55 @@ describe('SchedulePage', () => {
     
     expect(screen.getByTestId('time-slot-list')).toBeInTheDocument()
   })
+
+  it('期限切れスケジュールに「期限切れ」ラベルを表示する', async () => {
+    const expiredSchedule = {
+      id: 'test-uuid-456',
+      comment: '期限切れスケジュール',
+      timeSlots: [{
+        startTime: new Date('2025-07-04T10:00:00Z'),
+        endTime: new Date('2025-07-04T11:00:00Z'),
+        available: true
+      }],
+      createdAt: new Date('2025-07-01T00:00:00Z'),
+      expiresAt: new Date('2025-07-02T00:00:00Z')
+    }
+
+    mockGetSchedule.mockResolvedValue(expiredSchedule)
+    
+    const mockParams = { uuid: 'test-uuid-456' }
+    render(<SchedulePage params={mockParams} />)
+    
+    await waitFor(() => {
+      expect(screen.getByText('期限切れスケジュール')).toBeInTheDocument()
+    })
+    
+    expect(screen.getByTestId('expired-label')).toBeInTheDocument()
+    expect(screen.getByText('期限切れ')).toBeInTheDocument()
+  })
+
+  it('正常なスケジュールには期限切れラベルを表示しない', async () => {
+    const validSchedule = {
+      id: 'test-uuid-789',
+      comment: '正常なスケジュール',
+      timeSlots: [{
+        startTime: new Date('2025-07-04T10:00:00Z'),
+        endTime: new Date('2025-07-04T11:00:00Z'),
+        available: true
+      }],
+      createdAt: new Date('2025-07-03T00:00:00Z'),
+      expiresAt: new Date('2025-07-10T00:00:00Z')
+    }
+
+    mockGetSchedule.mockResolvedValue(validSchedule)
+    
+    const mockParams = { uuid: 'test-uuid-789' }
+    render(<SchedulePage params={mockParams} />)
+    
+    await waitFor(() => {
+      expect(screen.getByText('正常なスケジュール')).toBeInTheDocument()
+    })
+    
+    expect(screen.queryByTestId('expired-label')).not.toBeInTheDocument()
+  })
 })
