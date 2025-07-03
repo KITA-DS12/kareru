@@ -9,9 +9,12 @@ export default function Home() {
           手軽な日程共有サービス
         </p>
         <div className="space-y-4">
-          <button className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors">
+          <a 
+            href="/create" 
+            className="inline-block bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors"
+          >
             スケジュールを作成
-          </button>
+          </a>
         </div>
       </div>
     </main>
