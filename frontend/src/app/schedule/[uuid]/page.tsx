@@ -63,23 +63,31 @@ export default function SchedulePage({ params }: Props) {
     )
   }
 
-  const isExpired = new Date(schedule.expiresAt) < new Date()
+  const isExpired = schedule.expiresAt ? new Date(schedule.expiresAt) < new Date() : false
 
-  const formatDate = (date: Date) => {
+  const formatDate = (date: Date | string) => {
+    const dateObj = new Date(date)
+    if (isNaN(dateObj.getTime())) {
+      return '無効な日時'
+    }
     return new Intl.DateTimeFormat('ja-JP', {
       year: 'numeric',
       month: 'long',
       day: 'numeric',
       hour: '2-digit',
       minute: '2-digit'
-    }).format(date)
+    }).format(dateObj)
   }
 
-  const formatTime = (date: Date) => {
+  const formatTime = (date: Date | string) => {
+    const dateObj = new Date(date)
+    if (isNaN(dateObj.getTime())) {
+      return '無効な時刻'
+    }
     return new Intl.DateTimeFormat('ja-JP', {
       hour: '2-digit',
       minute: '2-digit'
-    }).format(date)
+    }).format(dateObj)
   }
 
   return (
@@ -107,7 +115,7 @@ export default function SchedulePage({ params }: Props) {
                 <div key={index} className="flex items-center p-3 bg-gray-50 rounded-lg">
                   <div className="flex-1">
                     <span className="text-gray-700 font-medium">
-                      {formatTime(new Date(slot.startTime))} - {formatTime(new Date(slot.endTime))}
+                      {formatTime(slot.startTime)} - {formatTime(slot.endTime)}
                     </span>
                   </div>
                   <div className={`px-2 py-1 rounded text-xs font-medium ${
@@ -123,8 +131,8 @@ export default function SchedulePage({ params }: Props) {
           </section>
 
           <footer className="text-sm text-gray-500 space-y-1">
-            <p>作成日時: {formatDate(new Date(schedule.createdAt))}</p>
-            <p>有効期限: {formatDate(new Date(schedule.expiresAt))}</p>
+            <p>作成日時: {formatDate(schedule.createdAt)}</p>
+            <p>有効期限: {formatDate(schedule.expiresAt)}</p>
           </footer>
         </main>
       </div>
