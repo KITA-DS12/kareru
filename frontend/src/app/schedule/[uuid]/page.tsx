@@ -3,6 +3,8 @@
 import { useEffect, useState } from 'react'
 import { getSchedule } from '../../../services/api'
 import { Schedule } from '../../../types/schedule'
+import { validateScheduleURL } from '../../../utils/url-validation'
+import { notFound } from 'next/navigation'
 
 interface Props {
   params: {
@@ -16,6 +18,13 @@ export default function SchedulePage({ params }: Props) {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
+    // URLバリデーションをチェック
+    const validation = validateScheduleURL(params.uuid)
+    if (!validation.isValid) {
+      notFound()
+      return
+    }
+
     const fetchSchedule = async () => {
       try {
         setLoading(true)

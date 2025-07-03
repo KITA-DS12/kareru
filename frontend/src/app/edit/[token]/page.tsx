@@ -3,6 +3,8 @@
 import { useEffect, useState } from 'react'
 import { getScheduleByToken, updateSchedule } from '../../../services/api'
 import { Schedule } from '../../../types/schedule'
+import { validateEditURL } from '../../../utils/url-validation'
+import { notFound } from 'next/navigation'
 
 interface Props {
   params: {
@@ -20,6 +22,13 @@ export default function EditPage({ params }: Props) {
   const [success, setSuccess] = useState(false)
 
   useEffect(() => {
+    // URLバリデーションをチェック
+    const validation = validateEditURL(params.token)
+    if (!validation.isValid) {
+      notFound()
+      return
+    }
+
     const fetchSchedule = async () => {
       try {
         setLoading(true)

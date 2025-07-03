@@ -1,4 +1,9 @@
 import Link from 'next/link'
+import { generateNotFoundMetadata } from '../utils/seo-metadata'
+
+export async function generateMetadata() {
+  return generateNotFoundMetadata()
+}
 
 export default function NotFound() {
   return (
