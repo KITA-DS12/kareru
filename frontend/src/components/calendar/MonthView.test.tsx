@@ -31,10 +31,10 @@ describe('MonthView Component', () => {
 
   it('should render current month dates', () => {
     render(<MonthView />)
-    // 7月の日付をいくつかテスト
-    expect(screen.getByText('1')).toBeInTheDocument()
-    expect(screen.getByText('15')).toBeInTheDocument()
-    expect(screen.getByText('31')).toBeInTheDocument()
+    // 7月の日付をテスト（test-idを使用して特定）
+    expect(screen.getByTestId('date-1')).toBeInTheDocument()
+    expect(screen.getByTestId('date-15')).toBeInTheDocument()
+    expect(screen.getByTestId('date-31')).toBeInTheDocument()
   })
 
   it('should highlight today date', () => {
