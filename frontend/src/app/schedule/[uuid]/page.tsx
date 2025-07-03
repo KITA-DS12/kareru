@@ -65,21 +65,68 @@ export default function SchedulePage({ params }: Props) {
 
   const isExpired = new Date(schedule.expiresAt) < new Date()
 
+  const formatDate = (date: Date) => {
+    return new Intl.DateTimeFormat('ja-JP', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    }).format(date)
+  }
+
+  const formatTime = (date: Date) => {
+    return new Intl.DateTimeFormat('ja-JP', {
+      hour: '2-digit',
+      minute: '2-digit'
+    }).format(date)
+  }
+
   return (
-    <div data-testid="schedule-page">
-      <h1>スケジュール表示</h1>
-      {isExpired && (
-        <div data-testid="expired-label" className="bg-red-100 text-red-600 px-2 py-1 rounded">
-          期限切れ
-        </div>
-      )}
-      <p>{schedule.comment}</p>
-      <div data-testid="time-slot-list">
-        {schedule.timeSlots.map((slot, index) => (
-          <div key={index}>
-            {new Date(slot.startTime).toLocaleTimeString()} - {new Date(slot.endTime).toLocaleTimeString()}
-          </div>
-        ))}
+    <div data-testid="schedule-page" className="min-h-screen bg-gray-50 py-8">
+      <div className="max-w-2xl mx-auto px-4">
+        <header className="mb-8">
+          <h1 className="text-3xl font-bold text-gray-900 mb-4">スケジュール表示</h1>
+          {isExpired && (
+            <div data-testid="expired-label" className="inline-block bg-red-100 text-red-700 px-3 py-1 rounded-full text-sm font-medium">
+              期限切れ
+            </div>
+          )}
+        </header>
+
+        <main className="bg-white rounded-lg shadow-sm border p-6">
+          <section className="mb-6">
+            <h2 className="text-lg font-semibold text-gray-800 mb-2">コメント</h2>
+            <p className="text-gray-600 leading-relaxed">{schedule.comment}</p>
+          </section>
+
+          <section className="mb-6">
+            <h2 className="text-lg font-semibold text-gray-800 mb-4">タイムスロット一覧</h2>
+            <div data-testid="time-slot-list" className="space-y-2">
+              {schedule.timeSlots.map((slot, index) => (
+                <div key={index} className="flex items-center p-3 bg-gray-50 rounded-lg">
+                  <div className="flex-1">
+                    <span className="text-gray-700 font-medium">
+                      {formatTime(new Date(slot.startTime))} - {formatTime(new Date(slot.endTime))}
+                    </span>
+                  </div>
+                  <div className={`px-2 py-1 rounded text-xs font-medium ${
+                    slot.available 
+                      ? 'bg-green-100 text-green-700' 
+                      : 'bg-gray-100 text-gray-600'
+                  }`}>
+                    {slot.available ? '利用可能' : '利用不可'}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </section>
+
+          <footer className="text-sm text-gray-500 space-y-1">
+            <p>作成日時: {formatDate(new Date(schedule.createdAt))}</p>
+            <p>有効期限: {formatDate(new Date(schedule.expiresAt))}</p>
+          </footer>
+        </main>
       </div>
     </div>
   )
