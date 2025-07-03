@@ -76,7 +76,7 @@ export default function MonthView({ currentDate = new Date(), onDateSelect }: Mo
   }
   
   return (
-    <div className="bg-white rounded-lg shadow p-6">
+    <div data-testid="month-view" className="bg-white rounded-lg shadow p-6">
       {/* ヘッダー: 月/年とナビゲーション */}
       <div className="flex items-center justify-between mb-6">
         <button

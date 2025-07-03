@@ -5,9 +5,9 @@ describe('CalendarView Component', () => {
   it('should render view mode toggle buttons', () => {
     render(<CalendarView />)
     
-    expect(screen.getByText('月')).toBeInTheDocument()
-    expect(screen.getByText('週')).toBeInTheDocument()
-    expect(screen.getByText('日')).toBeInTheDocument()
+    expect(screen.getByTestId('view-mode-month')).toBeInTheDocument()
+    expect(screen.getByTestId('view-mode-week')).toBeInTheDocument()
+    expect(screen.getByTestId('view-mode-day')).toBeInTheDocument()
   })
 
   it('should default to month view', () => {
