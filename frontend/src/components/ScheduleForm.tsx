@@ -25,6 +25,10 @@ export default function ScheduleForm() {
     return `${window.location.origin}/schedule/${id}`
   }
 
+  const generateEditUrl = (editToken: string) => {
+    return `${window.location.origin}/edit/${editToken}`
+  }
+
   const copyToClipboard = async (text: string) => {
     try {
       await navigator.clipboard.writeText(text)
@@ -36,28 +40,51 @@ export default function ScheduleForm() {
 
   if (successData) {
     const scheduleUrl = generateUrl(successData.id)
+    const editUrl = generateEditUrl(successData.editToken)
     
     return (
       <div className="max-w-2xl mx-auto p-6 bg-white rounded-lg shadow-lg">
         <h1 className="text-2xl font-bold text-gray-900 mb-6">スケジュールが作成されました</h1>
         
         <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-6">
-          <p className="text-green-800 mb-2">スケジュールが正常に作成されました。</p>
-          <div className="space-y-2">
-            <p className="text-sm text-gray-600">URL:</p>
-            <div className="flex gap-2">
-              <input
-                type="text"
-                value={scheduleUrl}
-                readOnly
-                className="flex-1 p-2 bg-gray-50 border border-gray-300 rounded text-sm"
-              />
-              <button
-                onClick={() => copyToClipboard(scheduleUrl)}
-                className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm"
-              >
-                コピー
-              </button>
+          <p className="text-green-800 mb-4">スケジュールが正常に作成されました。</p>
+          
+          <div className="space-y-4">
+            <div>
+              <p className="text-sm text-gray-600 mb-2">📋 公開URL（共有用）:</p>
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  value={scheduleUrl}
+                  readOnly
+                  className="flex-1 p-2 bg-gray-50 border border-gray-300 rounded text-sm"
+                />
+                <button
+                  onClick={() => copyToClipboard(scheduleUrl)}
+                  className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm"
+                >
+                  コピー
+                </button>
+              </div>
+            </div>
+            
+            <div>
+              <p className="text-sm text-gray-600 mb-2">✏️ 編集URL（管理用）:</p>
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  value={editUrl}
+                  readOnly
+                  className="flex-1 p-2 bg-gray-50 border border-gray-300 rounded text-sm"
+                />
+                <button
+                  onClick={() => copyToClipboard(editUrl)}
+                  className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 text-sm"
+                >
+                  コピー
+                </button>
+              </div>
+              <p className="text-xs text-gray-500 mt-1">⚠️ この編集URLは他人と共有しないでください</p>
             </div>
           </div>
         </div>
