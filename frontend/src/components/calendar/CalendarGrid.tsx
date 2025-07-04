@@ -150,11 +150,11 @@ export default function CalendarGrid({
       
       if (slotElement && containerRect) {
         const slotRect = slotElement.getBoundingClientRect()
-        return slotRect.top - containerRect.top + (minutes % 30) * (64 / 30)
+        return slotRect.top - containerRect.top + (minutes % 30) * (48 / 30)
       }
     }
     
-    return slotIndex * 64 + (minutes % 30) * (64 / 30)
+    return slotIndex * 48 + (minutes % 30) * (48 / 30)
   }, [])
   
   // 今日の列インデックスを取得
@@ -219,14 +219,14 @@ export default function CalendarGrid({
     
     // イベントの開始位置をスロット内での相対位置として計算
     const relativeStartMinutes = startMinutes - slotStartMinutes
-    const topPosition = (relativeStartMinutes / 30) * 64
+    const topPosition = (relativeStartMinutes / 30) * 48
     
-    const height = (duration / 30) * 64
+    const height = (duration / 30) * 48
     
     return {
-      top: `${Math.max(2, topPosition + 2)}px`,
-      height: `${Math.max(height - 4, 28)}px`,
-      minHeight: '28px'
+      top: `${Math.max(1, topPosition + 1)}px`,
+      height: `${Math.max(height - 2, 20)}px`,
+      minHeight: '20px'
     }
   }, [])
   
@@ -584,13 +584,10 @@ export default function CalendarGrid({
             <React.Fragment key={`slot-${slotIndex}`}>
               {/* 時刻ラベル */}
               <div 
-                className="h-16 border-r border-gray-200 bg-gray-50 flex items-center justify-center text-sm font-medium text-gray-600"
+                className="h-12 border-r border-gray-200 bg-gray-50 flex items-center justify-center text-xs font-medium text-gray-600"
                 data-testid={`time-label-${slotIndex}`}
               >
-                <div className="text-center">
-                  <div className="text-xs text-gray-500">{slot.label}</div>
-                  <div className="text-xs text-gray-400">{slot.timeRange}</div>
-                </div>
+                {slot.timeRange}
               </div>
               
               {/* 各日のタイムスロット */}
@@ -601,7 +598,7 @@ export default function CalendarGrid({
                   data-day-index={dayIndex}
                   data-slot-index={slotIndex}
                   data-time-start={`${slot.hour.toString().padStart(2, '0')}:${slot.minute.toString().padStart(2, '0')}`}
-                  className={`calendar-time-slot h-16 border-r border-gray-200 cursor-pointer relative group ${
+                  className={`calendar-time-slot h-12 border-r border-gray-200 cursor-pointer relative group ${
                     slotIndex % 2 === 0 ? 'border-b border-gray-100' : 'border-b border-dashed border-gray-100'
                   } ${
                     // 今日の列をハイライト

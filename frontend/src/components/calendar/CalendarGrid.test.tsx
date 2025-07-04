@@ -19,10 +19,10 @@ describe('CalendarGrid Component', () => {
       render(<CalendarGrid />)
       
       // 24時間分のタイムスロット（48個の30分間隔）
-      expect(screen.getByText('00:00')).toBeInTheDocument()
-      expect(screen.getByText('00:30')).toBeInTheDocument()
-      expect(screen.getByText('12:00')).toBeInTheDocument()
-      expect(screen.getByText('23:30')).toBeInTheDocument()
+      expect(screen.getByText('00:00 - 00:30')).toBeInTheDocument()
+      expect(screen.getByText('00:30 - 01:00')).toBeInTheDocument()
+      expect(screen.getByText('12:00 - 12:30')).toBeInTheDocument()
+      expect(screen.getByText('23:30 - 24:00')).toBeInTheDocument()
     })
 
     it('should display current time indicator', () => {
