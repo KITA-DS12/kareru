@@ -71,9 +71,7 @@ export default function WeekView({ currentDate = new Date(), schedule }: WeekVie
       <div
         key={slot.id}
         data-testid={`schedule-block-${slot.id}`}
-        className={`absolute inset-x-1 inset-y-0.5 rounded text-xs p-1 ${
-          slot.Available ? 'bg-green-200 text-green-800' : 'bg-red-200 text-red-800'
-        }`}
+        className="absolute inset-x-1 inset-y-0.5 rounded text-xs p-1 bg-green-200 text-green-800"
       >
         {new Date(slot.StartTime).toLocaleTimeString('ja-JP', {
           hour: '2-digit',

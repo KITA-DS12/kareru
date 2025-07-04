@@ -102,11 +102,11 @@ export default function ScheduleForm() {
                   type="text"
                   value={scheduleUrl}
                   readOnly
-                  className="flex-1 p-2 bg-gray-800 border border-gray-600 rounded text-sm text-gray-200"
+                  className="flex-1 p-2 bg-gray-750 border border-gray-600 rounded-md text-sm text-gray-100"
                 />
                 <button
                   onClick={() => copyToClipboard(scheduleUrl)}
-                  className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm"
+                  className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 text-sm shadow-md hover:shadow-lg transition-all duration-200"
                 >
                   コピー
                 </button>
@@ -120,11 +120,11 @@ export default function ScheduleForm() {
                   type="text"
                   value={editUrl}
                   readOnly
-                  className="flex-1 p-2 bg-gray-800 border border-gray-600 rounded text-sm text-gray-200"
+                  className="flex-1 p-2 bg-gray-750 border border-gray-600 rounded-md text-sm text-gray-100"
                 />
                 <button
                   onClick={() => copyToClipboard(editUrl)}
-                  className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 text-sm"
+                  className="px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 text-sm shadow-md hover:shadow-lg transition-all duration-200"
                 >
                   コピー
                 </button>
@@ -136,7 +136,7 @@ export default function ScheduleForm() {
 
         <button
           onClick={() => window.location.reload()}
-          className="w-full bg-gray-700 text-white py-3 px-4 rounded hover:bg-gray-600 transition-colors"
+          className="w-full bg-gray-600 text-white py-3 px-4 rounded-md hover:bg-gray-500 transition-all duration-200 shadow-md hover:shadow-lg"
         >
           新しいスケジュールを作成
         </button>
@@ -173,7 +173,7 @@ export default function ScheduleForm() {
             id="comment"
             value={comment}
             onChange={(e) => setComment(e.target.value)}
-            className="w-full p-3 border border-gray-600 rounded bg-gray-800 text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-sm"
+            className="w-full p-3 border border-gray-600 rounded-md bg-gray-750 text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 text-sm focus:shadow-lg"
             rows={3}
             placeholder="スケジュールについてのコメントを入力してください"
           />
@@ -188,7 +188,7 @@ export default function ScheduleForm() {
         <button
           type="submit"
           disabled={isLoading}
-          className="w-full bg-blue-600 text-white py-3 px-6 rounded hover:bg-blue-700 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed text-sm"
+          className="w-full bg-blue-500 text-white py-3 px-6 rounded-md hover:bg-blue-600 transition-all duration-200 font-medium disabled:opacity-50 disabled:cursor-not-allowed text-sm shadow-md hover:shadow-lg"
         >
           {isLoading ? '作成中...' : '作成'}
         </button>

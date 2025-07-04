@@ -120,8 +120,8 @@ export default function SchedulePage({ params }: Props) {
 
           <section className="mb-6">
             <h2 className="text-sm font-medium text-gray-200 mb-2">コメント</h2>
-            <div className="bg-gray-700 p-4 rounded border border-gray-600">
-              <p className="text-gray-200 text-sm leading-relaxed">{schedule.comment}</p>
+            <div className="bg-gray-750 p-4 rounded-md border border-gray-600">
+              <p className="text-gray-100 text-sm leading-relaxed">{schedule.comment}</p>
             </div>
           </section>
 

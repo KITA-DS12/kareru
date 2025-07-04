@@ -445,8 +445,8 @@ export default function CalendarGrid({
   // クライアントサイドでのみレンダリング
   if (!isClient) {
     return (
-      <div className="bg-white rounded-xl shadow-xl overflow-hidden border border-gray-100">
-        <div className="p-4 text-center text-gray-500">Loading calendar...</div>
+      <div className="bg-gray-900 rounded-lg overflow-hidden border border-gray-700">
+        <div className="p-4 text-center text-gray-300">Loading calendar...</div>
       </div>
     )
   }
@@ -473,10 +473,10 @@ export default function CalendarGrid({
                   e.preventDefault()
                   setDurationMode(mode)
                 }}
-                className={`px-3 py-1 text-xs font-medium rounded transition-colors ${
+                className={`px-3 py-1 text-xs font-medium rounded-md transition-all duration-200 ${
                   durationMode === mode
-                    ? 'bg-blue-600 text-white'
-                    : 'text-gray-300 hover:text-white hover:bg-gray-700'
+                    ? 'bg-blue-500 text-white shadow-md'
+                    : 'text-gray-300 hover:text-white hover:bg-gray-700 hover:shadow-sm'
                 }`}
               >
                 {mode}
@@ -493,7 +493,7 @@ export default function CalendarGrid({
             <div className="flex items-center space-x-2">
               <button
                 onClick={goToPreviousWeek}
-                className="flex items-center px-3 py-1 text-sm text-gray-300 hover:text-white hover:bg-gray-700 rounded transition-colors"
+                className="flex items-center px-3 py-1 text-sm text-gray-300 hover:text-white hover:bg-gray-700 rounded-md transition-all duration-200 hover:shadow-sm"
                 aria-label="前の週"
               >
                 <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -504,14 +504,14 @@ export default function CalendarGrid({
               
               <button
                 onClick={goToCurrentWeek}
-                className="px-3 py-1 text-sm bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
+                className="px-3 py-1 text-sm bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-all duration-200 shadow-md hover:shadow-lg"
               >
                 今週
               </button>
               
               <button
                 onClick={goToNextWeek}
-                className="flex items-center px-3 py-1 text-sm text-gray-300 hover:text-white hover:bg-gray-700 rounded transition-colors"
+                className="flex items-center px-3 py-1 text-sm text-gray-300 hover:text-white hover:bg-gray-700 rounded-md transition-all duration-200 hover:shadow-sm"
                 aria-label="次の週"
               >
                 翌週
@@ -606,7 +606,7 @@ export default function CalendarGrid({
                     // 既存のイベントがある場合は横線を表示しない
                     schedule?.timeSlots?.some(timeSlot => 
                       isSlotInTimeSlot(dayIndex, slotIndex, timeSlot)
-                    ) ? 'selected-available' : (
+                    ) ? 'selected-available border-2 border-green-400 bg-green-500/20' : (
                       // 1時間単位（:00）は濃い線、半時間単位（:30）は薄い線
                       slot.minute === 0 ? 'border-b border-gray-600' : 'border-b border-gray-800'
                     )
@@ -632,7 +632,7 @@ export default function CalendarGrid({
                       <div
                         key={`event-${event.id}-day-${dayIndex}-slot-${slotIndex}`}
                         data-testid={`event-bar-${event.id}`}
-                        className="calendar-event-bar absolute text-white font-medium cursor-pointer bg-green-600 hover:bg-green-700 transition-colors"
+                        className="calendar-event-bar absolute text-white font-medium cursor-pointer bg-green-500 hover:bg-green-600 transition-colors border border-green-400"
                         style={{
                           ...getEventStyle(event, slotIndex),
                           left: '2px',
@@ -685,7 +685,7 @@ export default function CalendarGrid({
                   type="datetime-local"
                   value={editingEvent.startTime}
                   onChange={(e) => setEditingEvent(prev => prev ? { ...prev, startTime: e.target.value } : null)}
-                  className="w-full p-3 border border-gray-600 rounded bg-gray-700 text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                  className="w-full p-3 border border-gray-600 rounded-md bg-gray-750 text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 focus:shadow-lg"
                 />
               </div>
               
@@ -697,7 +697,7 @@ export default function CalendarGrid({
                   type="datetime-local"
                   value={editingEvent.endTime}
                   onChange={(e) => setEditingEvent(prev => prev ? { ...prev, endTime: e.target.value } : null)}
-                  className="w-full p-3 border border-gray-600 rounded bg-gray-700 text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                  className="w-full p-3 border border-gray-600 rounded-md bg-gray-750 text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 focus:shadow-lg"
                 />
               </div>
             </div>
@@ -705,13 +705,13 @@ export default function CalendarGrid({
             <div className="flex space-x-3 mt-6">
               <button
                 onClick={handleEditSave}
-                className="flex-1 bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 transition-colors font-medium"
+                className="flex-1 bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 focus:ring-2 focus:ring-blue-500 transition-all duration-200 font-medium shadow-md hover:shadow-lg"
               >
                 保存
               </button>
               <button
                 onClick={handleDelete}
-                className="flex-1 bg-red-600 text-white py-2 px-4 rounded hover:bg-red-700 focus:ring-2 focus:ring-red-500 transition-colors font-medium"
+                className="flex-1 bg-red-500 text-white py-2 px-4 rounded-md hover:bg-red-600 focus:ring-2 focus:ring-red-500 transition-all duration-200 font-medium shadow-md hover:shadow-lg"
               >
                 削除
               </button>

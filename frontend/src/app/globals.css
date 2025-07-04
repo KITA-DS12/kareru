@@ -19,6 +19,7 @@ body {
 .bg-gray-100 { background-color: #374151 !important; }
 .bg-gray-200 { background-color: #4b5563 !important; }
 .bg-gray-300 { background-color: #6b7280 !important; }
+.bg-gray-750 { background-color: #3f4654 !important; }
 .bg-blue-25 { background-color: #f8fbff !important; }
 .bg-blue-50 { background-color: #e8f0fe !important; }
 .bg-blue-100 { background-color: #d2e3fc !important; }
@@ -147,7 +148,8 @@ body {
 
 /* Time slot selection states */
 .calendar-time-slot.selected-available {
-  background-color: rgba(52, 168, 83, 0.1) !important;
+  background-color: rgba(34, 197, 94, 0.2) !important;
+  border: 2px solid #22c55e !important;
   box-sizing: border-box !important;
 }
 
