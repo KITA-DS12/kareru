@@ -28,7 +28,7 @@ export default function ScheduleForm() {
   }
 
   // カレンダーからのタイムスロット作成
-  const handleCreateTimeSlotFromCalendar = (timeSlot: { StartTime: string; EndTime: string; Available: boolean }) => {
+  const handleCreateTimeSlotFromCalendar = (timeSlot: { StartTime: string; EndTime: string }) => {
     addTimeSlot(timeSlot.StartTime, timeSlot.EndTime)
   }
 
@@ -186,7 +186,7 @@ export default function ScheduleForm() {
                   <button
                     type="button"
                     onClick={() => removeTimeSlot(slot.id)}
-                    className="text-red-600 hover:text-red-800 font-medium"
+                    className="text-green-600 hover:text-green-800 font-medium"
                   >
                     削除
                   </button>
@@ -205,7 +205,7 @@ export default function ScheduleForm() {
         </div>
 
         {error && (
-          <div className="text-red-600 text-sm bg-red-50 p-3 rounded-md">
+          <div className="text-green-600 text-sm bg-green-50 p-3 rounded-md">
             {error}
           </div>
         )}

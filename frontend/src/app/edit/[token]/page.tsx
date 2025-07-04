@@ -2,9 +2,10 @@
 
 import { useEffect, useState } from 'react'
 import { getScheduleByToken, updateSchedule } from '../../../services/api'
-import { Schedule } from '../../../types/schedule'
+import { Schedule, TimeSlot } from '../../../types/schedule'
 import { validateEditURL } from '../../../utils/url-validation'
 import { notFound } from 'next/navigation'
+import CalendarGrid from '../../../components/calendar/CalendarGrid'
 
 interface Props {
   params: {
@@ -70,10 +71,25 @@ export default function EditPage({ params }: Props) {
     }
   }
 
-  const toggleTimeSlot = (index: number) => {
-    setTimeSlots(prev => prev.map((slot, i) => 
-      i === index ? { ...slot, Available: !slot.Available } : slot
+  // カレンダーからの新しいタイムスロット作成
+  const handleCreateTimeSlot = (timeSlot: Omit<TimeSlot, 'id'>) => {
+    const newSlot: TimeSlot = {
+      id: Date.now().toString(),
+      ...timeSlot
+    }
+    setTimeSlots(prev => [...prev, newSlot])
+  }
+
+  // タイムスロットの更新
+  const handleUpdateTimeSlot = (id: string, updates: Partial<TimeSlot>) => {
+    setTimeSlots(prev => prev.map(slot => 
+      slot.id === id ? { ...slot, ...updates } : slot
     ))
+  }
+
+  // タイムスロットの削除
+  const handleDeleteTimeSlot = (id: string) => {
+    setTimeSlots(prev => prev.filter(slot => slot.id !== id))
   }
 
   if (loading) {
@@ -89,7 +105,7 @@ export default function EditPage({ params }: Props) {
     return (
       <div data-testid="edit-page">
         <h1>スケジュール編集</h1>
-        <div data-testid="error-message" className="bg-red-100 text-red-600 px-4 py-2 rounded">
+        <div data-testid="error-message" className="bg-green-100 text-green-600 px-4 py-2 rounded">
           {error}
         </div>
       </div>
@@ -123,43 +139,32 @@ export default function EditPage({ params }: Props) {
           />
         </div>
         
-        <div data-testid="timeslot-list">
-          <h3 className="text-lg font-medium text-gray-900 mb-4">タイムスロット:</h3>
-          <div className="space-y-3">
-            {timeSlots.map((slot, index) => (
-              <div key={index} className="flex items-center p-4 border border-gray-200 rounded-md bg-gray-50">
-                <input
-                  type="checkbox"
-                  checked={slot.Available}
-                  onChange={() => toggleTimeSlot(index)}
-                  className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                />
-                <label className="ml-3 flex-1">
-                  <span className="text-sm font-medium text-gray-900">
-                    {new Date(slot.StartTime).toLocaleString('ja-JP', {
-                      year: 'numeric',
-                      month: 'short',
-                      day: 'numeric',
-                      hour: '2-digit',
-                      minute: '2-digit'
-                    })} 
-                    ～ 
-                    {new Date(slot.EndTime).toLocaleString('ja-JP', {
-                      hour: '2-digit',
-                      minute: '2-digit'
-                    })}
-                  </span>
-                  <div className="text-xs text-gray-500 mt-1">
-                    {slot.Available ? '✅ 利用可能' : '❌ 利用不可'}
-                  </div>
-                </label>
-              </div>
-            ))}
+        <div>
+          <h3 className="text-lg font-medium text-gray-900 mb-4">時間スロット</h3>
+          
+          {/* カレンダーUI */}
+          <div className="mb-6">
+            <p className="text-sm text-gray-600 mb-3">
+              カレンダー上でクリックして時間枠を追加・編集・削除できます
+            </p>
+            <CalendarGrid 
+              schedule={{
+                id: schedule.id || '',
+                comment: comment,
+                timeSlots: timeSlots,
+                editToken: params.token,
+                createdAt: schedule.createdAt || '',
+                expiresAt: schedule.expiresAt || ''
+              }}
+              onCreateTimeSlot={handleCreateTimeSlot}
+              onUpdateTimeSlot={handleUpdateTimeSlot}
+              onDeleteTimeSlot={handleDeleteTimeSlot}
+            />
           </div>
         </div>
 
         {error && (
-          <div className="text-red-600 text-sm bg-red-50 p-3 rounded-md">
+          <div className="text-green-600 text-sm bg-green-50 p-3 rounded-md">
             {error}
           </div>
         )}

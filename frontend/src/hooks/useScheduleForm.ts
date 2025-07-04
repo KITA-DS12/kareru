@@ -9,13 +9,51 @@ export function useScheduleForm() {
   const [isLoading, setIsLoading] = useState(false)
   const [successData, setSuccessData] = useState<CreateScheduleResponse | null>(null)
 
+  // 連続するタイムスロットを結合する関数
+  const mergeConsecutiveSlots = (slots: FormTimeSlot[]): FormTimeSlot[] => {
+    if (slots.length <= 1) return slots
+
+    // 開始時刻でソート
+    const sortedSlots = [...slots].sort((a, b) => 
+      new Date(a.startTime).getTime() - new Date(b.startTime).getTime()
+    )
+
+    const merged: FormTimeSlot[] = []
+    let current = sortedSlots[0]
+
+    for (let i = 1; i < sortedSlots.length; i++) {
+      const next = sortedSlots[i]
+      
+      // 現在のスロットの終了時刻と次のスロットの開始時刻が連続している場合
+      if (current.endTime === next.startTime) {
+        // 結合して継続
+        current = {
+          ...current,
+          endTime: next.endTime
+        }
+      } else {
+        // 連続していない場合は現在のスロットを結果に追加
+        merged.push(current)
+        current = next
+      }
+    }
+    
+    // 最後のスロットを追加
+    merged.push(current)
+    
+    return merged
+  }
+
   const addTimeSlot = (startTime?: string, endTime?: string) => {
     const newSlot: FormTimeSlot = {
       id: Date.now().toString(),
       startTime: startTime || '',
       endTime: endTime || ''
     }
-    setTimeSlots([...timeSlots, newSlot])
+    
+    const updatedSlots = [...timeSlots, newSlot]
+    const mergedSlots = mergeConsecutiveSlots(updatedSlots)
+    setTimeSlots(mergedSlots)
   }
 
   const removeTimeSlot = (id: string) => {
