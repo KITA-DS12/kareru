@@ -1,12 +1,13 @@
 import { useState } from 'react'
-import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/outline'
+import { Schedule, TimeSlot } from '../../types/schedule'
 
 interface MonthViewProps {
   currentDate?: Date
   onDateSelect?: (date: Date) => void
+  schedule?: Schedule
 }
 
-export default function MonthView({ currentDate = new Date(), onDateSelect }: MonthViewProps) {
+export default function MonthView({ currentDate = new Date(), onDateSelect, schedule }: MonthViewProps) {
   const [viewDate, setViewDate] = useState(currentDate)
   
   const today = new Date()
@@ -74,6 +75,40 @@ export default function MonthView({ currentDate = new Date(), onDateSelect }: Mo
     }
     return `date-${date.getDate()}`
   }
+
+  const getTimeSlotsForDate = (date: Date): TimeSlot[] => {
+    if (!schedule?.timeSlots) return []
+    
+    const year = date.getFullYear()
+    const month = date.getMonth()
+    const day = date.getDate()
+    
+    return schedule.timeSlots.filter(slot => {
+      const slotDate = new Date(slot.StartTime)
+      return slotDate.getFullYear() === year && 
+             slotDate.getMonth() === month && 
+             slotDate.getDate() === day
+    })
+  }
+
+  const renderScheduleIndicators = (date: Date) => {
+    const timeSlots = getTimeSlotsForDate(date)
+    if (timeSlots.length === 0) return null
+
+    return (
+      <div className="flex space-x-1 mt-1">
+        {timeSlots.map((slot, index) => (
+          <div
+            key={slot.id || index}
+            data-testid="schedule-indicator"
+            className={`w-2 h-1 rounded-full ${
+              slot.Available ? 'bg-green-500' : 'bg-red-500'
+            }`}
+          />
+        ))}
+      </div>
+    )
+  }
   
   return (
     <div data-testid="month-view" className="bg-white rounded-lg shadow p-6">
@@ -84,7 +119,9 @@ export default function MonthView({ currentDate = new Date(), onDateSelect }: Mo
           onClick={goToPreviousMonth}
           className="p-2 hover:bg-gray-100 rounded-full transition-colors"
         >
-          <ChevronLeftIcon className="h-5 w-5" />
+          <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+          </svg>
         </button>
         
         <h2 className="text-xl font-semibold text-gray-900">
@@ -96,7 +133,9 @@ export default function MonthView({ currentDate = new Date(), onDateSelect }: Mo
           onClick={goToNextMonth}
           className="p-2 hover:bg-gray-100 rounded-full transition-colors"
         >
-          <ChevronRightIcon className="h-5 w-5" />
+          <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+          </svg>
         </button>
       </div>
       
@@ -113,14 +152,14 @@ export default function MonthView({ currentDate = new Date(), onDateSelect }: Mo
       </div>
       
       {/* カレンダーグリッド */}
-      <div data-testid="calendar-grid" className="grid grid-cols-7 gap-1">
+      <div data-testid="calendar-grid" className="grid grid-cols-7 gap-1 min-w-0">
         {dates.map((date) => (
           <button
             key={date.toISOString()}
             data-testid={getDateTestId(date)}
             onClick={() => handleDateClick(date)}
             className={`
-              h-10 flex items-center justify-center text-sm rounded-md transition-colors
+              h-10 sm:h-14 flex flex-col items-center justify-start pt-1 text-xs sm:text-sm rounded-md transition-colors relative min-w-0
               ${isToday(date) 
                 ? 'bg-blue-600 text-white font-semibold' 
                 : 'hover:bg-gray-100'
@@ -131,7 +170,8 @@ export default function MonthView({ currentDate = new Date(), onDateSelect }: Mo
               }
             `}
           >
-            {date.getDate()}
+            <span>{date.getDate()}</span>
+            {renderScheduleIndicators(date)}
           </button>
         ))}
       </div>

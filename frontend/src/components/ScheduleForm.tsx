@@ -1,6 +1,7 @@
 'use client'
 
 import { useScheduleForm } from '../hooks/useScheduleForm'
+import CalendarGrid from './calendar/CalendarGrid'
 
 export default function ScheduleForm() {
   const {
@@ -15,6 +16,30 @@ export default function ScheduleForm() {
     updateTimeSlot,
     submitForm,
   } = useScheduleForm()
+
+  // CalendarGrid用のタイムスロット変換
+  const convertToCalendarTimeSlots = () => {
+    return timeSlots.map((slot, index) => ({
+      id: slot.id,
+      StartTime: slot.startTime,
+      EndTime: slot.endTime,
+      Available: true // 作成時は常に利用可能
+    }))
+  }
+
+  // カレンダーからのタイムスロット作成
+  const handleCreateTimeSlotFromCalendar = (timeSlot: { StartTime: string; EndTime: string; Available: boolean }) => {
+    addTimeSlot(timeSlot.StartTime, timeSlot.EndTime)
+  }
+
+  // 仮のスケジュールオブジェクト作成
+  const previewSchedule = {
+    id: 'preview',
+    comment: comment || 'プレビュー',
+    timeSlots: convertToCalendarTimeSlots(),
+    createdAt: new Date().toISOString(),
+    expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString()
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -121,43 +146,62 @@ export default function ScheduleForm() {
         <div>
           <h3 className="text-lg font-medium text-gray-900 mb-4">時間スロット</h3>
           
-          {timeSlots.map((slot) => (
-            <div key={slot.id} className="flex gap-4 items-center mb-4 p-4 border border-gray-200 rounded-md">
-              <div className="flex-1">
-                <label className="block text-sm text-gray-600 mb-1">開始時刻</label>
-                <input
-                  type="datetime-local"
-                  value={slot.startTime}
-                  onChange={(e) => updateTimeSlot(slot.id, 'startTime', e.target.value)}
-                  className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                />
-              </div>
-              <div className="flex-1">
-                <label className="block text-sm text-gray-600 mb-1">終了時刻</label>
-                <input
-                  type="datetime-local"
-                  value={slot.endTime}
-                  onChange={(e) => updateTimeSlot(slot.id, 'endTime', e.target.value)}
-                  className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                />
-              </div>
+          {/* カレンダーUI */}
+          <div className="mb-6">
+            <p className="text-sm text-gray-600 mb-3">
+              カレンダー上でクリック&ドラッグして時間範囲を選択できます
+            </p>
+            <CalendarGrid 
+              schedule={previewSchedule}
+              onCreateTimeSlot={handleCreateTimeSlotFromCalendar}
+            />
+          </div>
+
+          {/* 既存のフォーム形式（バックアップ用） */}
+          <details className="mb-4">
+            <summary className="cursor-pointer text-sm text-gray-600 hover:text-gray-800">
+              フォーム形式で編集（上級者向け）
+            </summary>
+            <div className="mt-4 space-y-4">
+              {timeSlots.map((slot) => (
+                <div key={slot.id} className="flex gap-4 items-center p-4 border border-gray-200 rounded-md">
+                  <div className="flex-1">
+                    <label className="block text-sm text-gray-600 mb-1">開始時刻</label>
+                    <input
+                      type="datetime-local"
+                      value={slot.startTime}
+                      onChange={(e) => updateTimeSlot(slot.id, 'startTime', e.target.value)}
+                      className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    />
+                  </div>
+                  <div className="flex-1">
+                    <label className="block text-sm text-gray-600 mb-1">終了時刻</label>
+                    <input
+                      type="datetime-local"
+                      value={slot.endTime}
+                      onChange={(e) => updateTimeSlot(slot.id, 'endTime', e.target.value)}
+                      className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    />
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => removeTimeSlot(slot.id)}
+                    className="text-red-600 hover:text-red-800 font-medium"
+                  >
+                    削除
+                  </button>
+                </div>
+              ))}
+
               <button
                 type="button"
-                onClick={() => removeTimeSlot(slot.id)}
-                className="text-red-600 hover:text-red-800 font-medium"
+                onClick={() => addTimeSlot()}
+                className="w-full py-2 px-4 border-2 border-dashed border-gray-300 rounded-md text-gray-600 hover:border-blue-500 hover:text-blue-600 transition-colors"
               >
-                削除
+                時間スロットを追加
               </button>
             </div>
-          ))}
-
-          <button
-            type="button"
-            onClick={addTimeSlot}
-            className="w-full py-2 px-4 border-2 border-dashed border-gray-300 rounded-md text-gray-600 hover:border-blue-500 hover:text-blue-600 transition-colors"
-          >
-            時間スロットを追加
-          </button>
+          </details>
         </div>
 
         {error && (

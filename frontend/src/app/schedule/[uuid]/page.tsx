@@ -5,6 +5,7 @@ import { getSchedule } from '../../../services/api'
 import { Schedule } from '../../../types/schedule'
 import { validateScheduleURL } from '../../../utils/url-validation'
 import { notFound } from 'next/navigation'
+import CalendarGrid from '../../../components/calendar/CalendarGrid'
 
 interface Props {
   params: {
@@ -118,25 +119,8 @@ export default function SchedulePage({ params }: Props) {
           </section>
 
           <section className="mb-6">
-            <h2 className="text-lg font-semibold text-gray-800 mb-4">タイムスロット一覧</h2>
-            <div data-testid="time-slot-list" className="space-y-2">
-              {schedule.timeSlots.map((slot, index) => (
-                <div key={index} className="flex items-center p-3 bg-gray-50 rounded-lg">
-                  <div className="flex-1">
-                    <span className="text-gray-700 font-medium">
-                      {formatTime(slot.StartTime)} - {formatTime(slot.EndTime)}
-                    </span>
-                  </div>
-                  <div className={`px-2 py-1 rounded text-xs font-medium ${
-                    slot.Available 
-                      ? 'bg-green-100 text-green-700' 
-                      : 'bg-gray-100 text-gray-600'
-                  }`}>
-                    {slot.Available ? '参加可能' : '参加不可'}
-                  </div>
-                </div>
-              ))}
-            </div>
+            <h2 className="text-lg font-semibold text-gray-800 mb-4">スケジュール</h2>
+            <CalendarGrid schedule={schedule} />
           </section>
 
           <footer className="text-sm text-gray-500 space-y-1">
