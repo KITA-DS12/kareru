@@ -461,20 +461,19 @@ export default function CalendarGrid({
       )}
       
       {/* 時間枠選択モード */}
-      <div className="p-4 border-b border-gray-100 bg-gray-50">
+      <div className="px-3 py-2 border-b border-gray-100 bg-gray-50">
         <div className="flex items-center justify-between">
-          <span className="text-sm font-medium text-gray-700">時間枠選択モード:</span>
-          <div className="flex space-x-2">
+          <span className="text-xs font-medium text-gray-700">モード:</span>
+          <div className="flex space-x-1">
             {(['30min', '1h', '3h', '1day'] as DurationMode[]).map((mode) => (
               <button
                 key={mode}
                 onClick={(e) => {
                   e.stopPropagation()
                   e.preventDefault()
-                  // console.log(`Duration mode changed from ${durationMode} to ${mode}`)
                   setDurationMode(mode)
                 }}
-                className={`px-3 py-1 text-sm rounded-md transition-colors ${
+                className={`px-2 py-1 text-xs rounded transition-colors ${
                   durationMode === mode
                     ? 'bg-emerald-500 text-white'
                     : 'bg-white text-gray-600 hover:bg-gray-100 border border-gray-300'
@@ -489,15 +488,15 @@ export default function CalendarGrid({
       
       {/* 週ナビゲーション */}
       {showWeekNavigation && (
-        <div className="px-4 py-3 border-b border-gray-100 bg-gray-50">
+        <div className="px-3 py-2 border-b border-gray-100 bg-gray-50">
           <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-3">
+            <div className="flex items-center space-x-2">
               <button
                 onClick={goToPreviousWeek}
-                className="flex items-center px-3 py-1.5 text-sm font-medium text-gray-600 bg-white border border-gray-300 rounded-md hover:bg-gray-50 hover:text-gray-700 transition-colors"
+                className="flex items-center px-2 py-1 text-xs font-medium text-gray-600 bg-white border border-gray-300 rounded hover:bg-gray-50 transition-colors"
                 aria-label="前の週"
               >
-                <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                 </svg>
                 前週
@@ -505,24 +504,24 @@ export default function CalendarGrid({
               
               <button
                 onClick={goToCurrentWeek}
-                className="px-3 py-1.5 text-sm font-medium text-blue-600 bg-blue-50 border border-blue-200 rounded-md hover:bg-blue-100 transition-colors"
+                className="px-2 py-1 text-xs font-medium text-blue-600 bg-blue-50 border border-blue-200 rounded hover:bg-blue-100 transition-colors"
               >
                 今週
               </button>
               
               <button
                 onClick={goToNextWeek}
-                className="flex items-center px-3 py-1.5 text-sm font-medium text-gray-600 bg-white border border-gray-300 rounded-md hover:bg-gray-50 hover:text-gray-700 transition-colors"
+                className="flex items-center px-2 py-1 text-xs font-medium text-gray-600 bg-white border border-gray-300 rounded hover:bg-gray-50 transition-colors"
                 aria-label="次の週"
               >
                 翌週
-                <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-3 h-3 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                 </svg>
               </button>
             </div>
             
-            <div className="text-sm font-medium text-gray-700">
+            <div className="text-xs font-medium text-gray-700">
               {getWeekRange().start} - {getWeekRange().end}
             </div>
           </div>
@@ -531,7 +530,7 @@ export default function CalendarGrid({
       
       {/* 週ヘッダー */}
       <div className="grid grid-cols-8 border-b border-gray-100 bg-gradient-to-r from-gray-50 to-white">
-        <div className="p-4 text-center font-semibold text-gray-600 border-r border-gray-100">
+        <div className="p-2 text-center font-semibold text-gray-600 border-r border-gray-100 text-xs">
           時刻
         </div>
         {weekDates.map((date, index) => {
@@ -540,16 +539,16 @@ export default function CalendarGrid({
           return (
             <div 
               key={`header-${date.toISOString()}`}
-              className={`p-4 text-center border-r border-gray-100 transition-colors ${
+              className={`p-2 text-center border-r border-gray-100 transition-colors ${
                 isToday 
                   ? 'bg-blue-50 text-blue-700 font-bold' 
                   : 'text-gray-700 hover:bg-gray-50'
               }`}
             >
-              <div className="text-sm font-medium">
+              <div className="text-xs font-medium">
                 {weekdays[jstDate.getDay()]}
               </div>
-              <div className={`text-lg ${isToday ? 'font-bold' : 'font-medium'}`}>
+              <div className={`text-sm ${isToday ? 'font-bold' : 'font-medium'}`}>
                 {jstDate.getDate()}
               </div>
             </div>
@@ -561,7 +560,7 @@ export default function CalendarGrid({
       <div 
         ref={containerRef}
         data-testid="time-grid-container"
-        className="relative overflow-y-auto h-[600px] bg-gradient-to-b from-white to-gray-25"
+        className="relative overflow-y-auto h-[400px] bg-gradient-to-b from-white to-gray-25"
       >
         {/* 現在時刻インジケーター */}
         {todayColumnIndex !== -1 && (

@@ -122,31 +122,14 @@ export default function EditPage({ params }: Props) {
   }
 
   return (
-    <div data-testid="edit-page" className="max-w-2xl mx-auto p-6 bg-white rounded-lg shadow-lg">
-      <h1 className="text-2xl font-bold text-gray-900 mb-6">スケジュール編集</h1>
-      <form data-testid="edit-form" onSubmit={(e) => { e.preventDefault(); handleSave(); }} className="space-y-6">
+    <div data-testid="edit-page" className="max-w-5xl mx-auto p-4 bg-white rounded-lg shadow-lg">
+      <h1 className="text-xl font-bold text-gray-900 mb-4">スケジュール編集</h1>
+      <form data-testid="edit-form" onSubmit={(e) => { e.preventDefault(); handleSave(); }} className="space-y-4">
         <div>
-          <label htmlFor="comment" className="block text-sm font-medium text-gray-700 mb-2">
-            コメント:
-          </label>
-          <textarea
-            id="comment"
-            value={comment}
-            onChange={(e) => setComment(e.target.value)}
-            className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            rows={3}
-            placeholder="スケジュールについてのコメントを入力してください"
-          />
-        </div>
-        
-        <div>
-          <h3 className="text-lg font-medium text-gray-900 mb-4">時間スロット</h3>
+          <h3 className="text-lg font-medium text-gray-900 mb-2">時間スロット</h3>
           
           {/* カレンダーUI */}
-          <div className="mb-6">
-            <p className="text-sm text-gray-600 mb-3">
-              カレンダー上でクリックして時間枠を追加・編集・削除できます
-            </p>
+          <div className="mb-4">
             <CalendarGrid 
               schedule={{
                 id: schedule.id || '',
@@ -164,14 +147,28 @@ export default function EditPage({ params }: Props) {
           </div>
         </div>
 
+        <div>
+          <label htmlFor="comment" className="block text-sm font-medium text-gray-700 mb-1">
+            コメント
+          </label>
+          <textarea
+            id="comment"
+            value={comment}
+            onChange={(e) => setComment(e.target.value)}
+            className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+            rows={2}
+            placeholder="スケジュールについてのコメント"
+          />
+        </div>
+
         {error && (
-          <div className="text-green-600 text-sm bg-green-50 p-3 rounded-md">
+          <div className="text-green-600 text-sm bg-green-50 p-2 rounded-md">
             {error}
           </div>
         )}
 
         {success && (
-          <div className="text-green-600 text-sm bg-green-50 p-3 rounded-md">
+          <div className="text-green-600 text-sm bg-green-50 p-2 rounded-md">
             ✅ スケジュールが正常に更新されました
           </div>
         )}
@@ -179,7 +176,7 @@ export default function EditPage({ params }: Props) {
         <button 
           type="submit" 
           disabled={saving}
-          className="w-full bg-blue-600 text-white py-3 px-4 rounded-md hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+          className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed text-sm"
         >
           {saving ? '保存中...' : '保存'}
         </button>
