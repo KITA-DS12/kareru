@@ -122,11 +122,11 @@ export default function EditPage({ params }: Props) {
   }
 
   return (
-    <div data-testid="edit-page" className="max-w-5xl mx-auto p-6 bg-white rounded-2xl shadow-2xl border-0 ring-1 ring-slate-200/50">
-      <h1 className="text-2xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent mb-6">スケジュール編集</h1>
+    <div data-testid="edit-page" className="max-w-5xl mx-auto p-6 bg-gray-900 rounded-lg border border-gray-700">
+      <h1 className="text-2xl font-bold text-gray-100 mb-6">スケジュール編集</h1>
       <form data-testid="edit-form" onSubmit={(e) => { e.preventDefault(); handleSave(); }} className="space-y-6">
         <div>
-          <h3 className="text-lg font-semibold text-slate-800 mb-3">時間スロット</h3>
+          <h3 className="text-lg font-medium text-gray-200 mb-3">時間スロット</h3>
           
           {/* カレンダーUI */}
           <div className="mb-4">
@@ -148,27 +148,27 @@ export default function EditPage({ params }: Props) {
         </div>
 
         <div>
-          <label htmlFor="comment" className="block text-sm font-semibold text-slate-700 mb-2">
+          <label htmlFor="comment" className="block text-sm font-medium text-gray-200 mb-2">
             コメント
           </label>
           <textarea
             id="comment"
             value={comment}
             onChange={(e) => setComment(e.target.value)}
-            className="w-full p-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 bg-slate-50 focus:bg-white transition-all duration-200 text-sm"
+            className="w-full p-3 border border-gray-600 rounded bg-gray-800 text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-sm"
             rows={3}
             placeholder="スケジュールについてのコメントを入力してください"
           />
         </div>
 
         {error && (
-          <div className="text-red-700 text-sm bg-gradient-to-r from-red-50 to-rose-50 p-3 rounded-xl border border-red-200">
+          <div className="text-red-200 text-sm bg-red-900/50 p-3 rounded border border-red-700">
             {error}
           </div>
         )}
 
         {success && (
-          <div className="text-emerald-700 text-sm bg-gradient-to-r from-emerald-50 to-teal-50 p-3 rounded-xl border border-emerald-200">
+          <div className="text-green-200 text-sm bg-green-900/50 p-3 rounded border border-green-700">
             ✅ スケジュールが正常に更新されました
           </div>
         )}
@@ -176,7 +176,7 @@ export default function EditPage({ params }: Props) {
         <button 
           type="submit" 
           disabled={saving}
-          className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-3 px-6 rounded-xl hover:from-indigo-700 hover:to-purple-700 transition-all duration-200 font-semibold disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-indigo-500/25 hover:shadow-indigo-500/40 text-sm"
+          className="w-full bg-blue-600 text-white py-3 px-6 rounded hover:bg-blue-700 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed text-sm"
         >
           {saving ? '保存中...' : '保存'}
         </button>
