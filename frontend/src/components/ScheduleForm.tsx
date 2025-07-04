@@ -12,6 +12,8 @@ export default function ScheduleForm() {
     isLoading,
     successData,
     addTimeSlot,
+    addTimeSlots,
+    addTimeSlotsWithMerge,
     removeTimeSlot,
     updateTimeSlot,
     submitForm,
@@ -28,8 +30,26 @@ export default function ScheduleForm() {
   }
 
   // カレンダーからのタイムスロット作成
-  const handleCreateTimeSlotFromCalendar = (timeSlot: { StartTime: string; EndTime: string; Available: boolean }) => {
+  const handleCreateTimeSlotFromCalendar = (timeSlot: { StartTime: string; EndTime: string }) => {
     addTimeSlot(timeSlot.StartTime, timeSlot.EndTime)
+  }
+
+  // カレンダーからの複数タイムスロット作成
+  const handleCreateTimeSlotsFromCalendar = (timeSlots: Array<{ StartTime: string; EndTime: string }>) => {
+    const formattedSlots = timeSlots.map(slot => ({
+      startTime: slot.StartTime,
+      endTime: slot.EndTime
+    }))
+    addTimeSlots(formattedSlots)
+  }
+
+  // カレンダーからの重複時マージ対応タイムスロット作成
+  const handleCreateTimeSlotsWithMergeFromCalendar = (timeSlots: Array<{ StartTime: string; EndTime: string }>) => {
+    const formattedSlots = timeSlots.map(slot => ({
+      startTime: slot.StartTime,
+      endTime: slot.EndTime
+    }))
+    addTimeSlotsWithMerge(formattedSlots)
   }
 
   // 仮のスケジュールオブジェクト作成
@@ -154,6 +174,8 @@ export default function ScheduleForm() {
             <CalendarGrid 
               schedule={previewSchedule}
               onCreateTimeSlot={handleCreateTimeSlotFromCalendar}
+              onCreateTimeSlots={handleCreateTimeSlotsFromCalendar}
+              onCreateTimeSlotsWithMerge={handleCreateTimeSlotsWithMergeFromCalendar}
             />
           </div>
 
@@ -186,7 +208,7 @@ export default function ScheduleForm() {
                   <button
                     type="button"
                     onClick={() => removeTimeSlot(slot.id)}
-                    className="text-red-600 hover:text-red-800 font-medium"
+                    className="text-green-600 hover:text-green-800 font-medium"
                   >
                     削除
                   </button>
@@ -205,7 +227,7 @@ export default function ScheduleForm() {
         </div>
 
         {error && (
-          <div className="text-red-600 text-sm bg-red-50 p-3 rounded-md">
+          <div className="text-green-600 text-sm bg-green-50 p-3 rounded-md">
             {error}
           </div>
         )}
