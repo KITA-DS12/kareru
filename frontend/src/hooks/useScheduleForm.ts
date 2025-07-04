@@ -9,11 +9,11 @@ export function useScheduleForm() {
   const [isLoading, setIsLoading] = useState(false)
   const [successData, setSuccessData] = useState<CreateScheduleResponse | null>(null)
 
-  const addTimeSlot = () => {
+  const addTimeSlot = (startTime?: string, endTime?: string) => {
     const newSlot: FormTimeSlot = {
       id: Date.now().toString(),
-      startTime: '',
-      endTime: ''
+      startTime: startTime || '',
+      endTime: endTime || ''
     }
     setTimeSlots([...timeSlots, newSlot])
   }
