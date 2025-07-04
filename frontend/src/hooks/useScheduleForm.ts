@@ -24,8 +24,14 @@ export function useScheduleForm() {
     for (let i = 1; i < sortedSlots.length; i++) {
       const next = sortedSlots[i]
       
+      // 日付をチェックして同じ日付内でのみ結合を許可
+      const currentEndDate = new Date(current.endTime)
+      const nextStartDate = new Date(next.startTime)
+      const isSameDate = currentEndDate.toDateString() === nextStartDate.toDateString()
+      
       // 現在のスロットの終了時刻と次のスロットの開始時刻が連続している場合
-      if (current.endTime === next.startTime) {
+      // ただし、同じ日付内でのみ結合を許可
+      if (current.endTime === next.startTime && isSameDate) {
         // 結合して継続
         current = {
           ...current,
@@ -52,6 +58,19 @@ export function useScheduleForm() {
     }
     
     const updatedSlots = [...timeSlots, newSlot]
+    const mergedSlots = mergeConsecutiveSlots(updatedSlots)
+    setTimeSlots(mergedSlots)
+  }
+
+  // 複数のタイムスロットを一度に追加する関数
+  const addTimeSlots = (newSlots: Array<{ startTime: string; endTime: string }>) => {
+    const formattedSlots: FormTimeSlot[] = newSlots.map((slot, index) => ({
+      id: (Date.now() + index).toString(),
+      startTime: slot.startTime,
+      endTime: slot.endTime
+    }))
+    
+    const updatedSlots = [...timeSlots, ...formattedSlots]
     const mergedSlots = mergeConsecutiveSlots(updatedSlots)
     setTimeSlots(mergedSlots)
   }
@@ -128,6 +147,7 @@ export function useScheduleForm() {
     successData,
     setIsLoading,
     addTimeSlot,
+    addTimeSlots,
     removeTimeSlot,
     updateTimeSlot,
     validateForm,

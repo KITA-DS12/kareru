@@ -12,6 +12,7 @@ export default function ScheduleForm() {
     isLoading,
     successData,
     addTimeSlot,
+    addTimeSlots,
     removeTimeSlot,
     updateTimeSlot,
     submitForm,
@@ -30,6 +31,15 @@ export default function ScheduleForm() {
   // カレンダーからのタイムスロット作成
   const handleCreateTimeSlotFromCalendar = (timeSlot: { StartTime: string; EndTime: string }) => {
     addTimeSlot(timeSlot.StartTime, timeSlot.EndTime)
+  }
+
+  // カレンダーからの複数タイムスロット作成
+  const handleCreateTimeSlotsFromCalendar = (timeSlots: Array<{ StartTime: string; EndTime: string }>) => {
+    const formattedSlots = timeSlots.map(slot => ({
+      startTime: slot.StartTime,
+      endTime: slot.EndTime
+    }))
+    addTimeSlots(formattedSlots)
   }
 
   // 仮のスケジュールオブジェクト作成
@@ -154,6 +164,7 @@ export default function ScheduleForm() {
             <CalendarGrid 
               schedule={previewSchedule}
               onCreateTimeSlot={handleCreateTimeSlotFromCalendar}
+              onCreateTimeSlots={handleCreateTimeSlotsFromCalendar}
             />
           </div>
 

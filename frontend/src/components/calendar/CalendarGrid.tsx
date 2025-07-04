@@ -15,6 +15,7 @@ interface CalendarGridProps {
   schedule?: Schedule
   currentDate?: Date
   onCreateTimeSlot?: (timeSlot: Omit<TimeSlot, 'id'>) => void
+  onCreateTimeSlots?: (timeSlots: Array<Omit<TimeSlot, 'id'>>) => void
   onUpdateTimeSlot?: (id: string, updates: Partial<TimeSlot>) => void
   onDeleteTimeSlot?: (id: string) => void
 }
@@ -29,6 +30,7 @@ export default function CalendarGrid({
   schedule,
   currentDate = new Date(),
   onCreateTimeSlot,
+  onCreateTimeSlots,
   onUpdateTimeSlot,
   onDeleteTimeSlot
 }: CalendarGridProps) {
@@ -87,8 +89,8 @@ export default function CalendarGrid({
       })
     }
     const dates = getJSTWeekDates(currentDate)
-    console.log('Week dates:', dates.map((date, index) => `${index}: ${date.getDate()}日 (${['日', '月', '火', '水', '木', '金', '土'][date.getDay()]})`))
-    console.log('Week dates ISO:', dates.map((date, index) => `${index}: ${date.toISOString()}`))
+    // console.log('Week dates:', dates.map((date, index) => `${index}: ${date.getDate()}日 (${['日', '月', '火', '水', '木', '金', '土'][date.getDay()]})`))
+    // console.log('Week dates ISO:', dates.map((date, index) => `${index}: ${date.toISOString()}`))
     return dates
   }, [currentDate, isClient])
   
@@ -132,13 +134,32 @@ export default function CalendarGrid({
     const dayDate = weekDates[dayIndex]
     if (!dayDate) return []
     
-    return schedule.timeSlots.filter(timeSlot => {
+    const filteredEvents = schedule.timeSlots.filter(timeSlot => {
       const eventStartTime = new Date(timeSlot.StartTime)
       const jstEventStart = utcToJST(eventStartTime)
       const jstDayDate = utcToJST(dayDate)
       
-      return jstEventStart.toDateString() === jstDayDate.toDateString()
+      const isMatch = jstEventStart.toDateString() === jstDayDate.toDateString()
+      
+      if (dayIndex === 3) { // 水曜日（今テストしている日）のログを出力
+        // console.log(`DEBUG: Event filter for day ${dayIndex}:`)
+        // console.log(`  TimeSlot: ${timeSlot.StartTime} - ${timeSlot.EndTime}`)
+        // console.log(`  EventStart JST: ${jstEventStart.toDateString()}`)
+        // console.log(`  DayDate JST: ${jstDayDate.toDateString()}`)
+        // console.log(`  Match: ${isMatch}`)
+      }
+      
+      return isMatch
     })
+    
+    if (dayIndex === 3) {
+      // console.log(`DEBUG: Filtered events for day ${dayIndex}: ${filteredEvents.length}`)
+      // console.log(`DEBUG: All timeSlots in schedule:`, schedule?.timeSlots?.map(slot => 
+      //   `${slot.StartTime} - ${slot.EndTime}`
+      // ))
+    }
+    
+    return filteredEvents
   }, [schedule?.timeSlots, weekDates])
   
   // イベントの表示スタイル計算（スロット内での相対位置）
@@ -214,7 +235,7 @@ export default function CalendarGrid({
   
   // 時間枠選択モードに応じたクリック処理
   const handleSlotClick = useCallback((dayIndex: number, slotIndex: number) => {
-    console.log(`DEBUG: handleSlotClick called with dayIndex=${dayIndex}, slotIndex=${slotIndex}, mode=${durationMode}`)
+    // console.log(`DEBUG: handleSlotClick called with dayIndex=${dayIndex}, slotIndex=${slotIndex}, mode=${durationMode}`)
     if (!onCreateTimeSlot) return
     
     const dayDate = weekDates[dayIndex]
@@ -234,8 +255,8 @@ export default function CalendarGrid({
       const startTimeStr = `${jstDayDate.getFullYear()}-${String(jstDayDate.getMonth() + 1).padStart(2, '0')}-${String(jstDayDate.getDate()).padStart(2, '0')}T00:00:00`
       const endTimeStr = `${jstDayDate.getFullYear()}-${String(jstDayDate.getMonth() + 1).padStart(2, '0')}-${String(jstDayDate.getDate()).padStart(2, '0')}T23:59:00`
       
-      console.log(`1day selection: ${startTimeStr} - ${endTimeStr}`)
-      console.log(`DEBUG: Creating 1day timeSlot from handleSlotClick`)
+      // console.log(`1day selection: ${startTimeStr} - ${endTimeStr}`)
+      // console.log(`DEBUG: Creating 1day timeSlot from handleSlotClick`)
       
       onCreateTimeSlot({
         StartTime: startTimeStr,
@@ -248,14 +269,19 @@ export default function CalendarGrid({
     const slotsToCreate = getDurationSlots(durationMode)
     const endSlotIndex = slotIndex + slotsToCreate
     
-    console.log(`Slot Click: dayIndex=${dayIndex}, slotIndex=${slotIndex}, mode=${durationMode}, slots=${slotsToCreate}`)
+    // console.log(`Slot Click: dayIndex=${dayIndex}, slotIndex=${slotIndex}, mode=${durationMode}, slots=${slotsToCreate}`)
     
-    // 日をまたぐかどうかチェック（48スロット = 24時間）
-    if (endSlotIndex > 48) {
+    // 日をまたぐかどうかチェック（48スロット = 24時間、インデックス0-47）
+    if (endSlotIndex >= 48) {
+      // console.log(`DEBUG: Cross-day detected - startSlot=${slotIndex}, endSlot=${endSlotIndex}, slotsToCreate=${slotsToCreate}`)
+      // console.log(`DEBUG: dayDate=${dayDate.toISOString()}, jstDayDate=${jstDayDate.toISOString()}`)
+      
       // 日をまたぐ場合：当日分と翌日分に分割
       const todayEndSlot = 48
       const tomorrowStartSlot = 0
       const tomorrowEndSlot = endSlotIndex - 48
+      
+      // console.log(`DEBUG: Split - today: ${slotIndex}-${todayEndSlot}, tomorrow: ${tomorrowStartSlot}-${tomorrowEndSlot}`)
       
       // 当日分と翌日分の重複チェック
       const startHours = Math.floor(slotIndex / 2)
@@ -267,13 +293,20 @@ export default function CalendarGrid({
       const nextDayDate = weekDates[nextDayIndex]
       const jstNextDayDate = nextDayIndex < weekDates.length ? utcToJST(nextDayDate) : null
       
+      // console.log(`DEBUG: nextDayDate=${nextDayDate?.toISOString()}, jstNextDayDate=${jstNextDayDate?.toISOString()}`)
+      
       // 当日分の時間範囲重複チェック
       const todayStartTime = `${String(startHours).padStart(2, '0')}:${String(startMinutes).padStart(2, '0')}:00`
-      const hasTodayOverlap = hasTimeRangeOverlap(jstDayDate, todayStartTime, jstDayDate, '23:59:00')
+      const todayEndTime = '23:59:00' // 当日は必ず23:59で終了
+      const hasTodayOverlap = hasTimeRangeOverlap(jstDayDate, todayStartTime, jstDayDate, todayEndTime)
+      
+      // console.log(`DEBUG: Today time range - ${todayStartTime} to ${todayEndTime}, overlap=${hasTodayOverlap}`)
       
       // 翌日分の時間範囲重複チェック
       const tomorrowEndTime = `${String(endHours).padStart(2, '0')}:${String(endMinutes).padStart(2, '0')}:00`
       const hasTomorrowOverlap = jstNextDayDate && hasTimeRangeOverlap(jstNextDayDate, '00:00:00', jstNextDayDate, tomorrowEndTime)
+      
+      // console.log(`DEBUG: Tomorrow time range - 00:00:00 to ${tomorrowEndTime}, overlap=${hasTomorrowOverlap}, nextDayExists=${!!jstNextDayDate}`)
       
       if (hasTodayOverlap || hasTomorrowOverlap) {
         setErrorMessage('選択した時間帯に既に予定があります')
@@ -284,16 +317,10 @@ export default function CalendarGrid({
       const todayStartTimeStr = `${jstDayDate.getFullYear()}-${String(jstDayDate.getMonth() + 1).padStart(2, '0')}-${String(jstDayDate.getDate()).padStart(2, '0')}T${String(startHours).padStart(2, '0')}:${String(startMinutes).padStart(2, '0')}:00`
       const todayEndTimeStr = `${jstDayDate.getFullYear()}-${String(jstDayDate.getMonth() + 1).padStart(2, '0')}-${String(jstDayDate.getDate()).padStart(2, '0')}T23:59:00`
       
-      console.log(`Cross-day today: ${todayStartTimeStr} - ${todayEndTimeStr}`)
-      console.log(`DEBUG: Creating cross-day today timeSlot from handleSlotClick`)
-      
-      onCreateTimeSlot({
-        StartTime: todayStartTimeStr,
-        EndTime: todayEndTimeStr
-      })
+      // console.log(`Cross-day today: ${todayStartTimeStr} - ${todayEndTimeStr}`)
       
       // 翌日分を作成（00:00～終了時刻）
-      if (nextDayIndex < weekDates.length) {
+      if (nextDayIndex < weekDates.length && onCreateTimeSlots) {
         const nextDayDate = weekDates[nextDayIndex]
         const jstNextDayDate = utcToJST(nextDayDate)
         const endHours = Math.floor(tomorrowEndSlot / 2)
@@ -302,12 +329,24 @@ export default function CalendarGrid({
         const tomorrowStartTimeStr = `${jstNextDayDate.getFullYear()}-${String(jstNextDayDate.getMonth() + 1).padStart(2, '0')}-${String(jstNextDayDate.getDate()).padStart(2, '0')}T00:00:00`
         const tomorrowEndTimeStr = `${jstNextDayDate.getFullYear()}-${String(jstNextDayDate.getMonth() + 1).padStart(2, '0')}-${String(jstNextDayDate.getDate()).padStart(2, '0')}T${String(endHours).padStart(2, '0')}:${String(endMinutes).padStart(2, '0')}:00`
         
-        console.log(`Cross-day tomorrow: ${tomorrowStartTimeStr} - ${tomorrowEndTimeStr}`)
-        console.log(`DEBUG: Creating cross-day tomorrow timeSlot from handleSlotClick`)
+        // console.log(`Cross-day tomorrow: ${tomorrowStartTimeStr} - ${tomorrowEndTimeStr}`)
         
+        // 両方のタイムスロットを一度に作成
+        onCreateTimeSlots([
+          {
+            StartTime: todayStartTimeStr,
+            EndTime: todayEndTimeStr
+          },
+          {
+            StartTime: tomorrowStartTimeStr,
+            EndTime: tomorrowEndTimeStr
+          }
+        ])
+      } else if (onCreateTimeSlot) {
+        // onCreateTimeSlotsが利用できない場合は従来の方法
         onCreateTimeSlot({
-          StartTime: tomorrowStartTimeStr,
-          EndTime: tomorrowEndTimeStr
+          StartTime: todayStartTimeStr,
+          EndTime: todayEndTimeStr
         })
       }
       
@@ -334,8 +373,8 @@ export default function CalendarGrid({
     const startTimeStr = `${jstDayDate.getFullYear()}-${String(jstDayDate.getMonth() + 1).padStart(2, '0')}-${String(jstDayDate.getDate()).padStart(2, '0')}T${startTime}`
     const endTimeStr = `${jstDayDate.getFullYear()}-${String(jstDayDate.getMonth() + 1).padStart(2, '0')}-${String(jstDayDate.getDate()).padStart(2, '0')}T${endTime}`
     
-    console.log(`Normal selection: ${startTimeStr} - ${endTimeStr}`)
-    console.log(`DEBUG: Creating normal timeSlot from handleSlotClick`)
+    // console.log(`Normal selection: ${startTimeStr} - ${endTimeStr}`)
+    // console.log(`DEBUG: Creating normal timeSlot from handleSlotClick`)
     
     onCreateTimeSlot({
       StartTime: startTimeStr,
@@ -403,7 +442,7 @@ export default function CalendarGrid({
                 onClick={(e) => {
                   e.stopPropagation()
                   e.preventDefault()
-                  console.log(`Duration mode changed from ${durationMode} to ${mode}`)
+                  // console.log(`Duration mode changed from ${durationMode} to ${mode}`)
                   setDurationMode(mode)
                 }}
                 className={`px-3 py-1 text-sm rounded-md transition-colors ${
