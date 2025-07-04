@@ -2,13 +2,23 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Google Calendar UI Styles */
-.bg-white { background-color: #ffffff !important; }
-.bg-gray-25 { background-color: #fafbfc !important; }
-.bg-gray-50 { background-color: #f8f9fa !important; }
-.bg-gray-100 { background-color: #f1f3f4 !important; }
-.bg-gray-200 { background-color: #e8eaed !important; }
-.bg-gray-300 { background-color: #dadce0 !important; }
+/* Dark mode base styles */
+html, body {
+  background-color: #111827;
+  color: #f3f4f6;
+}
+
+body {
+  min-height: 100vh;
+}
+
+/* Google Calendar UI Styles - Dark Mode Override */
+.bg-white { background-color: #1f2937 !important; }
+.bg-gray-25 { background-color: #1f2937 !important; }
+.bg-gray-50 { background-color: #1f2937 !important; }
+.bg-gray-100 { background-color: #374151 !important; }
+.bg-gray-200 { background-color: #4b5563 !important; }
+.bg-gray-300 { background-color: #6b7280 !important; }
 .bg-blue-25 { background-color: #f8fbff !important; }
 .bg-blue-50 { background-color: #e8f0fe !important; }
 .bg-blue-100 { background-color: #d2e3fc !important; }
@@ -52,10 +62,10 @@
 .font-medium { font-weight: 500 !important; }
 .font-bold { font-weight: 700 !important; }
 
-.text-gray-500 { color: #9aa0a6 !important; }
-.text-gray-600 { color: #5f6368 !important; }
-.text-gray-700 { color: #3c4043 !important; }
-.text-gray-800 { color: #202124 !important; }
+.text-gray-500 { color: #9ca3af !important; }
+.text-gray-600 { color: #d1d5db !important; }
+.text-gray-700 { color: #e5e7eb !important; }
+.text-gray-800 { color: #f3f4f6 !important; }
 .text-blue-600 { color: #1a73e8 !important; }
 .text-blue-700 { color: #1967d2 !important; }
 .text-white { color: #ffffff !important; }
@@ -94,7 +104,7 @@
 .transition-all { transition-property: all !important; transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1) !important; }
 .duration-200 { transition-duration: 200ms !important; }
 
-.hover\:bg-gray-25:hover { background-color: #fafbfc !important; }
+.hover\:bg-gray-25:hover { background-color: #374151 !important; }
 .hover\:bg-blue-25:hover { background-color: #f8fbff !important; }
 .hover\:bg-blue-50:hover { background-color: #e8f0fe !important; }
 .hover\:border-blue-200:hover { border-color: #aecbfa !important; }
@@ -131,8 +141,8 @@
 }
 
 .calendar-time-slot:hover {
-  background-color: #f8fbff;
-  border-color: #aecbfa;
+  background-color: #374151;
+  border-color: #4b5563;
 }
 
 /* Time slot selection states */
