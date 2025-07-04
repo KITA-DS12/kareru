@@ -55,7 +55,7 @@ export async function updateSchedule(token: string, schedule: Omit<Schedule, 'id
       timeSlots: schedule.timeSlots.map(slot => ({
         startTime: new Date(slot.StartTime).toISOString(),
         endTime: new Date(slot.EndTime).toISOString(),
-        available: slot.Available,
+        available: true,
       })),
     }),
   })

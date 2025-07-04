@@ -16,12 +16,12 @@ export default function Home() {
   }, [router])
 
   return (
-    <main className="min-h-screen bg-gray-50 flex items-center justify-center">
+    <main className="min-h-screen bg-gray-900 flex items-center justify-center">
       <div className="text-center">
-        <h1 className="text-4xl font-bold text-gray-900 mb-4">
+        <h1 className="text-4xl font-bold text-gray-100 mb-4">
           Kareru
         </h1>
-        <p className="text-gray-600 mb-4">
+        <p className="text-gray-300 mb-4">
           手軽な日程共有サービス
         </p>
         

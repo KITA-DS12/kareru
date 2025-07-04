@@ -16,7 +16,7 @@ func main() {
 
 	// CORS設定
 	config := cors.DefaultConfig()
-	config.AllowOrigins = []string{"http://localhost:3000"} // Next.jsのデフォルトポート
+	config.AllowAllOrigins = true // 開発時のテスト用
 	config.AllowMethods = []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"}
 	config.AllowHeaders = []string{"Origin", "Content-Type", "Accept", "Authorization"}
 	config.AllowCredentials = true
