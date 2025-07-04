@@ -26,7 +26,7 @@ export default function CalendarView({ currentDate = new Date(), onDateSelect, s
     if (viewMode === mode) {
       return `${baseClasses} bg-blue-600 text-white`
     }
-    return `${baseClasses} bg-gray-200 text-gray-700 hover:bg-gray-300`
+    return `${baseClasses} bg-rose-500 text-white hover:bg-rose-600 dark:bg-rose-600 dark:hover:bg-rose-700`
   }, [viewMode])
 
   const renderCurrentView = useMemo(() => {
@@ -44,7 +44,7 @@ export default function CalendarView({ currentDate = new Date(), onDateSelect, s
     <div className="space-y-6">
       {/* 表示モード切り替えボタン */}
       <div className="flex justify-center">
-        <div className="inline-flex rounded-lg border border-gray-200 p-1 bg-gray-50">
+        <div className="inline-flex rounded-lg border border-amber-300 p-1 bg-amber-100 dark:border-amber-600 dark:bg-amber-800">
           {viewModeButtons.map(({ mode, label }) => (
             <button
               key={mode}

@@ -126,8 +126,6 @@ export default function EditPage({ params }: Props) {
       <h1 className="text-2xl font-bold text-gray-100 mb-6">スケジュール編集</h1>
       <form data-testid="edit-form" onSubmit={(e) => { e.preventDefault(); handleSave(); }} className="space-y-6">
         <div>
-          <h3 className="text-lg font-medium text-gray-200 mb-3">時間スロット</h3>
-          
           {/* カレンダーUI */}
           <div className="mb-4">
             <CalendarGrid 

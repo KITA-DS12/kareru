@@ -136,7 +136,7 @@ export default function ScheduleForm() {
 
         <button
           onClick={() => window.location.reload()}
-          className="w-full bg-gray-600 text-white py-3 px-4 rounded-md hover:bg-gray-500 transition-all duration-200 shadow-md hover:shadow-lg"
+          className="w-full bg-emerald-600 text-white py-3 px-4 rounded-md hover:bg-emerald-700 transition-all duration-200 shadow-md hover:shadow-lg dark:bg-emerald-700 dark:hover:bg-emerald-800"
         >
           新しいスケジュールを作成
         </button>
@@ -150,8 +150,6 @@ export default function ScheduleForm() {
       
       <form onSubmit={handleSubmit} className="space-y-6">
         <div>
-          <h3 className="text-lg font-medium text-gray-200 mb-3">時間スロット</h3>
-          
           {/* カレンダーUI */}
           <div className="mb-4">
             <CalendarGrid 

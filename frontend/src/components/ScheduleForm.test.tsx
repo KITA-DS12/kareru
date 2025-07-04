@@ -38,7 +38,7 @@ describe('ScheduleForm', () => {
     fireEvent.click(submitButton)
     
     await waitFor(() => {
-      expect(screen.getByText('時間スロットを追加してください')).toBeInTheDocument()
+      expect(screen.getByText('カレンダーから利用可能な時間を選択してください')).toBeInTheDocument()
     })
   })
 
