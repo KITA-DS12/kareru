@@ -13,6 +13,7 @@ export default function ScheduleForm() {
     successData,
     addTimeSlot,
     addTimeSlots,
+    addTimeSlotsWithMerge,
     removeTimeSlot,
     updateTimeSlot,
     submitForm,
@@ -40,6 +41,15 @@ export default function ScheduleForm() {
       endTime: slot.EndTime
     }))
     addTimeSlots(formattedSlots)
+  }
+
+  // カレンダーからの重複時マージ対応タイムスロット作成
+  const handleCreateTimeSlotsWithMergeFromCalendar = (timeSlots: Array<{ StartTime: string; EndTime: string }>) => {
+    const formattedSlots = timeSlots.map(slot => ({
+      startTime: slot.StartTime,
+      endTime: slot.EndTime
+    }))
+    addTimeSlotsWithMerge(formattedSlots)
   }
 
   // 仮のスケジュールオブジェクト作成
@@ -165,6 +175,7 @@ export default function ScheduleForm() {
               schedule={previewSchedule}
               onCreateTimeSlot={handleCreateTimeSlotFromCalendar}
               onCreateTimeSlots={handleCreateTimeSlotsFromCalendar}
+              onCreateTimeSlotsWithMerge={handleCreateTimeSlotsWithMergeFromCalendar}
             />
           </div>
 

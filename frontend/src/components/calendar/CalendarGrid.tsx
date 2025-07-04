@@ -16,6 +16,7 @@ interface CalendarGridProps {
   currentDate?: Date
   onCreateTimeSlot?: (timeSlot: Omit<TimeSlot, 'id'>) => void
   onCreateTimeSlots?: (timeSlots: Array<Omit<TimeSlot, 'id'>>) => void
+  onCreateTimeSlotsWithMerge?: (timeSlots: Array<Omit<TimeSlot, 'id'>>) => void
   onUpdateTimeSlot?: (id: string, updates: Partial<TimeSlot>) => void
   onDeleteTimeSlot?: (id: string) => void
 }
@@ -31,6 +32,7 @@ export default function CalendarGrid({
   currentDate = new Date(),
   onCreateTimeSlot,
   onCreateTimeSlots,
+  onCreateTimeSlotsWithMerge,
   onUpdateTimeSlot,
   onDeleteTimeSlot
 }: CalendarGridProps) {
@@ -243,25 +245,21 @@ export default function CalendarGrid({
     
     // 1day選択の場合は0:00～23:59を選択
     if (durationMode === '1day') {
-      // 時間範囲の重複チェック
-      const hasOverlap = hasTimeRangeOverlap(jstDayDate, '00:00:00', jstDayDate, '23:59:00')
-      
-      if (hasOverlap) {
-        setErrorMessage('選択した日に既に予定があります')
-        return
-      }
-      
-      // 0:00～23:59の時間枠を作成
+      // 0:00～23:59の時間枠を作成（重複時は自動マージ）
       const startTimeStr = `${jstDayDate.getFullYear()}-${String(jstDayDate.getMonth() + 1).padStart(2, '0')}-${String(jstDayDate.getDate()).padStart(2, '0')}T00:00:00`
       const endTimeStr = `${jstDayDate.getFullYear()}-${String(jstDayDate.getMonth() + 1).padStart(2, '0')}-${String(jstDayDate.getDate()).padStart(2, '0')}T23:59:00`
       
-      // console.log(`1day selection: ${startTimeStr} - ${endTimeStr}`)
-      // console.log(`DEBUG: Creating 1day timeSlot from handleSlotClick`)
-      
-      onCreateTimeSlot({
-        StartTime: startTimeStr,
-        EndTime: endTimeStr
-      })
+      if (onCreateTimeSlotsWithMerge) {
+        onCreateTimeSlotsWithMerge([{
+          StartTime: startTimeStr,
+          EndTime: endTimeStr
+        }])
+      } else if (onCreateTimeSlot) {
+        onCreateTimeSlot({
+          StartTime: startTimeStr,
+          EndTime: endTimeStr
+        })
+      }
       return
     }
     
@@ -283,7 +281,7 @@ export default function CalendarGrid({
       
       // console.log(`DEBUG: Split - today: ${slotIndex}-${todayEndSlot}, tomorrow: ${tomorrowStartSlot}-${tomorrowEndSlot}`)
       
-      // 当日分と翌日分の重複チェック
+      // 当日分と翌日分の時間計算
       const startHours = Math.floor(slotIndex / 2)
       const startMinutes = (slotIndex % 2) * 30
       const endHours = Math.floor(tomorrowEndSlot / 2)
@@ -293,26 +291,6 @@ export default function CalendarGrid({
       const nextDayDate = weekDates[nextDayIndex]
       const jstNextDayDate = nextDayIndex < weekDates.length ? utcToJST(nextDayDate) : null
       
-      // console.log(`DEBUG: nextDayDate=${nextDayDate?.toISOString()}, jstNextDayDate=${jstNextDayDate?.toISOString()}`)
-      
-      // 当日分の時間範囲重複チェック
-      const todayStartTime = `${String(startHours).padStart(2, '0')}:${String(startMinutes).padStart(2, '0')}:00`
-      const todayEndTime = '23:59:00' // 当日は必ず23:59で終了
-      const hasTodayOverlap = hasTimeRangeOverlap(jstDayDate, todayStartTime, jstDayDate, todayEndTime)
-      
-      // console.log(`DEBUG: Today time range - ${todayStartTime} to ${todayEndTime}, overlap=${hasTodayOverlap}`)
-      
-      // 翌日分の時間範囲重複チェック
-      const tomorrowEndTime = `${String(endHours).padStart(2, '0')}:${String(endMinutes).padStart(2, '0')}:00`
-      const hasTomorrowOverlap = jstNextDayDate && hasTimeRangeOverlap(jstNextDayDate, '00:00:00', jstNextDayDate, tomorrowEndTime)
-      
-      // console.log(`DEBUG: Tomorrow time range - 00:00:00 to ${tomorrowEndTime}, overlap=${hasTomorrowOverlap}, nextDayExists=${!!jstNextDayDate}`)
-      
-      if (hasTodayOverlap || hasTomorrowOverlap) {
-        setErrorMessage('選択した時間帯に既に予定があります')
-        return
-      }
-      
       // 当日分を作成（開始時刻～23:59）
       const todayStartTimeStr = `${jstDayDate.getFullYear()}-${String(jstDayDate.getMonth() + 1).padStart(2, '0')}-${String(jstDayDate.getDate()).padStart(2, '0')}T${String(startHours).padStart(2, '0')}:${String(startMinutes).padStart(2, '0')}:00`
       const todayEndTimeStr = `${jstDayDate.getFullYear()}-${String(jstDayDate.getMonth() + 1).padStart(2, '0')}-${String(jstDayDate.getDate()).padStart(2, '0')}T23:59:00`
@@ -320,7 +298,7 @@ export default function CalendarGrid({
       // console.log(`Cross-day today: ${todayStartTimeStr} - ${todayEndTimeStr}`)
       
       // 翌日分を作成（00:00～終了時刻）
-      if (nextDayIndex < weekDates.length && onCreateTimeSlots) {
+      if (nextDayIndex < weekDates.length) {
         const nextDayDate = weekDates[nextDayIndex]
         const jstNextDayDate = utcToJST(nextDayDate)
         const endHours = Math.floor(tomorrowEndSlot / 2)
@@ -331,23 +309,36 @@ export default function CalendarGrid({
         
         // console.log(`Cross-day tomorrow: ${tomorrowStartTimeStr} - ${tomorrowEndTimeStr}`)
         
-        // 両方のタイムスロットを一度に作成
-        onCreateTimeSlots([
-          {
+        // 両方のタイムスロットを一度に作成（重複時は自動マージ）
+        if (onCreateTimeSlotsWithMerge) {
+          onCreateTimeSlotsWithMerge([
+            {
+              StartTime: todayStartTimeStr,
+              EndTime: todayEndTimeStr
+            },
+            {
+              StartTime: tomorrowStartTimeStr,
+              EndTime: tomorrowEndTimeStr
+            }
+          ])
+        } else if (onCreateTimeSlots) {
+          onCreateTimeSlots([
+            {
+              StartTime: todayStartTimeStr,
+              EndTime: todayEndTimeStr
+            },
+            {
+              StartTime: tomorrowStartTimeStr,
+              EndTime: tomorrowEndTimeStr
+            }
+          ])
+        } else if (onCreateTimeSlot) {
+          // フォールバック：従来の方法
+          onCreateTimeSlot({
             StartTime: todayStartTimeStr,
             EndTime: todayEndTimeStr
-          },
-          {
-            StartTime: tomorrowStartTimeStr,
-            EndTime: tomorrowEndTimeStr
-          }
-        ])
-      } else if (onCreateTimeSlot) {
-        // onCreateTimeSlotsが利用できない場合は従来の方法
-        onCreateTimeSlot({
-          StartTime: todayStartTimeStr,
-          EndTime: todayEndTimeStr
-        })
+          })
+        }
       }
       
       return
@@ -359,28 +350,27 @@ export default function CalendarGrid({
     const endHours = Math.floor(endSlotIndex / 2)
     const endMinutes = (endSlotIndex % 2) * 30
     
-    // 時間範囲の重複チェック
+    // 時間文字列の作成
     const startTime = `${String(startHours).padStart(2, '0')}:${String(startMinutes).padStart(2, '0')}:00`
     const endTime = `${String(endHours).padStart(2, '0')}:${String(endMinutes).padStart(2, '0')}:00`
-    const hasOverlap = hasTimeRangeOverlap(jstDayDate, startTime, jstDayDate, endTime)
-    
-    if (hasOverlap) {
-      setErrorMessage('選択した時間帯に既に予定があります')
-      return
-    }
     
     // 日本時間でのISO文字列を作成
     const startTimeStr = `${jstDayDate.getFullYear()}-${String(jstDayDate.getMonth() + 1).padStart(2, '0')}-${String(jstDayDate.getDate()).padStart(2, '0')}T${startTime}`
     const endTimeStr = `${jstDayDate.getFullYear()}-${String(jstDayDate.getMonth() + 1).padStart(2, '0')}-${String(jstDayDate.getDate()).padStart(2, '0')}T${endTime}`
     
-    // console.log(`Normal selection: ${startTimeStr} - ${endTimeStr}`)
-    // console.log(`DEBUG: Creating normal timeSlot from handleSlotClick`)
-    
-    onCreateTimeSlot({
-      StartTime: startTimeStr,
-      EndTime: endTimeStr
-    })
-  }, [onCreateTimeSlot, weekDates, schedule?.timeSlots, isSlotInTimeSlot, weekdays, durationMode, getDurationSlots])
+    // 重複時は自動マージで作成
+    if (onCreateTimeSlotsWithMerge) {
+      onCreateTimeSlotsWithMerge([{
+        StartTime: startTimeStr,
+        EndTime: endTimeStr
+      }])
+    } else if (onCreateTimeSlot) {
+      onCreateTimeSlot({
+        StartTime: startTimeStr,
+        EndTime: endTimeStr
+      })
+    }
+  }, [onCreateTimeSlot, onCreateTimeSlots, onCreateTimeSlotsWithMerge, weekDates, schedule?.timeSlots, isSlotInTimeSlot, weekdays, durationMode, getDurationSlots])
   
   // イベントクリック処理
   const handleEventClick = useCallback((event: TimeSlot) => {

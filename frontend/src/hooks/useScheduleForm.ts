@@ -75,6 +75,62 @@ export function useScheduleForm() {
     setTimeSlots(mergedSlots)
   }
 
+  // 重複を含む時間スロットを統合する関数（重複時は結合）
+  const addTimeSlotsWithMerge = (newSlots: Array<{ startTime: string; endTime: string }>) => {
+    const formattedSlots: FormTimeSlot[] = newSlots.map((slot, index) => ({
+      id: (Date.now() + index).toString(),
+      startTime: slot.startTime,
+      endTime: slot.endTime
+    }))
+    
+    // 既存スロットと新規スロットを統合
+    const allSlots = [...timeSlots, ...formattedSlots]
+    
+    // 重複する範囲も含めて全て結合
+    const mergedSlots = mergeOverlappingSlots(allSlots)
+    setTimeSlots(mergedSlots)
+  }
+
+  // 重複・隣接する時間スロットを全て結合する関数
+  const mergeOverlappingSlots = (slots: FormTimeSlot[]): FormTimeSlot[] => {
+    if (slots.length <= 1) return slots
+
+    // 開始時刻でソート
+    const sortedSlots = [...slots].sort((a, b) => 
+      new Date(a.startTime).getTime() - new Date(b.startTime).getTime()
+    )
+
+    const merged: FormTimeSlot[] = []
+    let current = sortedSlots[0]
+
+    for (let i = 1; i < sortedSlots.length; i++) {
+      const next = sortedSlots[i]
+      
+      const currentEnd = new Date(current.endTime)
+      const nextStart = new Date(next.startTime)
+      const nextEnd = new Date(next.endTime)
+      
+      // 重複または隣接している場合は結合
+      // (current.end >= next.start) で重複・隣接をチェック
+      if (currentEnd >= nextStart) {
+        // 結合：終了時刻は後の方を採用
+        current = {
+          ...current,
+          endTime: currentEnd > nextEnd ? current.endTime : next.endTime
+        }
+      } else {
+        // 重複していない場合は現在のスロットを保存
+        merged.push(current)
+        current = next
+      }
+    }
+    
+    // 最後のスロットを追加
+    merged.push(current)
+    
+    return merged
+  }
+
   const removeTimeSlot = (id: string) => {
     setTimeSlots(timeSlots.filter(slot => slot.id !== id))
   }
@@ -148,6 +204,7 @@ export function useScheduleForm() {
     setIsLoading,
     addTimeSlot,
     addTimeSlots,
+    addTimeSlotsWithMerge,
     removeTimeSlot,
     updateTimeSlot,
     validateForm,

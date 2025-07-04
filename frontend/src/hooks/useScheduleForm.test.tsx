@@ -156,6 +156,105 @@ describe('useScheduleForm', () => {
     })
   })
 
+  describe('addTimeSlotsWithMerge', () => {
+    it('重複する時間スロットを結合する', () => {
+      const { result } = renderHook(() => useScheduleForm())
+
+      // 最初に10:00-11:00を追加
+      act(() => {
+        result.current.addTimeSlot('2025-07-04T10:00:00', '2025-07-04T11:00:00')
+      })
+
+      // 重複する10:30-12:00を追加（10:00-12:00に結合されるべき）
+      act(() => {
+        result.current.addTimeSlotsWithMerge([
+          { startTime: '2025-07-04T10:30:00', endTime: '2025-07-04T12:00:00' }
+        ])
+      })
+
+      expect(result.current.timeSlots).toHaveLength(1)
+      expect(result.current.timeSlots[0]).toMatchObject({
+        startTime: '2025-07-04T10:00:00',
+        endTime: '2025-07-04T12:00:00'
+      })
+    })
+
+    it('完全に重複する時間スロットを結合する', () => {
+      const { result } = renderHook(() => useScheduleForm())
+
+      // 最初に10:00-12:00を追加
+      act(() => {
+        result.current.addTimeSlot('2025-07-04T10:00:00', '2025-07-04T12:00:00')
+      })
+
+      // 完全に包含される11:00-11:30を追加（変化なしのはず）
+      act(() => {
+        result.current.addTimeSlotsWithMerge([
+          { startTime: '2025-07-04T11:00:00', endTime: '2025-07-04T11:30:00' }
+        ])
+      })
+
+      expect(result.current.timeSlots).toHaveLength(1)
+      expect(result.current.timeSlots[0]).toMatchObject({
+        startTime: '2025-07-04T10:00:00',
+        endTime: '2025-07-04T12:00:00'
+      })
+    })
+
+    it('複数の既存スロットと新規スロットを結合する', () => {
+      const { result } = renderHook(() => useScheduleForm())
+
+      // 最初に2つの離れたスロットを追加
+      act(() => {
+        result.current.addTimeSlots([
+          { startTime: '2025-07-04T10:00:00', endTime: '2025-07-04T11:00:00' },
+          { startTime: '2025-07-04T14:00:00', endTime: '2025-07-04T15:00:00' }
+        ])
+      })
+
+      // 中間をつなぐスロットを追加（全て結合されるべき）
+      act(() => {
+        result.current.addTimeSlotsWithMerge([
+          { startTime: '2025-07-04T11:00:00', endTime: '2025-07-04T14:00:00' }
+        ])
+      })
+
+      expect(result.current.timeSlots).toHaveLength(1)
+      expect(result.current.timeSlots[0]).toMatchObject({
+        startTime: '2025-07-04T10:00:00',
+        endTime: '2025-07-04T15:00:00'
+      })
+    })
+
+    it('日付跨ぎスロットでも重複チェックして結合する', () => {
+      const { result } = renderHook(() => useScheduleForm())
+
+      // 最初に当日の一部を追加
+      act(() => {
+        result.current.addTimeSlot('2025-07-04T20:00:00', '2025-07-04T22:30:00')
+      })
+
+      // 日付跨ぎで重複するスロットを追加
+      act(() => {
+        result.current.addTimeSlotsWithMerge([
+          { startTime: '2025-07-04T22:00:00', endTime: '2025-07-04T23:59:00' },
+          { startTime: '2025-07-05T00:00:00', endTime: '2025-07-05T01:00:00' }
+        ])
+      })
+
+      // 当日分は結合され、翌日分は独立
+      expect(result.current.timeSlots).toHaveLength(2)
+      expect(result.current.timeSlots[0]).toMatchObject({
+        startTime: '2025-07-04T20:00:00',
+        endTime: '2025-07-04T23:59:00'
+      })
+      expect(result.current.timeSlots[1]).toMatchObject({
+        startTime: '2025-07-05T00:00:00',
+        endTime: '2025-07-05T01:00:00'
+      })
+    })
+  })
+
   describe('addTimeSlots', () => {
     it('複数の時間スロットを一度に追加する', () => {
       const { result } = renderHook(() => useScheduleForm())
