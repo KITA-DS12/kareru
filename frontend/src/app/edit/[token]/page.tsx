@@ -159,6 +159,7 @@ export default function EditPage({ params }: Props) {
               onCreateTimeSlot={handleCreateTimeSlot}
               onUpdateTimeSlot={handleUpdateTimeSlot}
               onDeleteTimeSlot={handleDeleteTimeSlot}
+              showWeekNavigation={true}
             />
           </div>
         </div>

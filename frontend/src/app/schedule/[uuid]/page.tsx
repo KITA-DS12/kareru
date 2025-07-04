@@ -120,7 +120,7 @@ export default function SchedulePage({ params }: Props) {
 
           <section className="mb-6">
             <h2 className="text-lg font-semibold text-gray-800 mb-4">スケジュール</h2>
-            <CalendarGrid schedule={schedule} />
+            <CalendarGrid schedule={schedule} showWeekNavigation={true} />
           </section>
 
           <footer className="text-sm text-gray-500 space-y-1">

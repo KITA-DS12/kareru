@@ -176,6 +176,7 @@ export default function ScheduleForm() {
               onCreateTimeSlot={handleCreateTimeSlotFromCalendar}
               onCreateTimeSlots={handleCreateTimeSlotsFromCalendar}
               onCreateTimeSlotsWithMerge={handleCreateTimeSlotsWithMergeFromCalendar}
+              showWeekNavigation={true}
             />
           </div>
 

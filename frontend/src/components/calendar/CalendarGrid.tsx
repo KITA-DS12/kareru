@@ -19,6 +19,7 @@ interface CalendarGridProps {
   onCreateTimeSlotsWithMerge?: (timeSlots: Array<Omit<TimeSlot, 'id'>>) => void
   onUpdateTimeSlot?: (id: string, updates: Partial<TimeSlot>) => void
   onDeleteTimeSlot?: (id: string) => void
+  showWeekNavigation?: boolean
 }
 
 interface EditingEvent {
@@ -34,13 +35,15 @@ export default function CalendarGrid({
   onCreateTimeSlots,
   onCreateTimeSlotsWithMerge,
   onUpdateTimeSlot,
-  onDeleteTimeSlot
+  onDeleteTimeSlot,
+  showWeekNavigation = true
 }: CalendarGridProps) {
   const [editingEvent, setEditingEvent] = useState<EditingEvent | null>(null)
   const [hoveredEvent, setHoveredEvent] = useState<string | null>(null)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const [durationMode, setDurationMode] = useState<DurationMode>('30min')
   const [isClient, setIsClient] = useState(false)
+  const [displayDate, setDisplayDate] = useState(() => currentDate)
   
   const containerRef = useRef<HTMLDivElement>(null)
   
@@ -48,6 +51,42 @@ export default function CalendarGrid({
   useEffect(() => {
     setIsClient(true)
   }, [])
+
+  // 週ナビゲーション関数
+  const goToPreviousWeek = useCallback(() => {
+    const newDate = new Date(displayDate)
+    newDate.setDate(newDate.getDate() - 7)
+    setDisplayDate(newDate)
+  }, [displayDate])
+
+  const goToNextWeek = useCallback(() => {
+    const newDate = new Date(displayDate)
+    newDate.setDate(newDate.getDate() + 7)
+    setDisplayDate(newDate)
+  }, [displayDate])
+
+  const goToCurrentWeek = useCallback(() => {
+    setDisplayDate(new Date())
+  }, [])
+
+  // 週の範囲を取得する関数
+  const getWeekRange = useCallback(() => {
+    if (!isClient) return { start: '', end: '' }
+    
+    const dates = getJSTWeekDates(displayDate)
+    const startDate = dates[0] // 日曜日
+    const endDate = dates[6] // 土曜日
+    
+    const formatDate = (date: Date) => {
+      const jstDate = utcToJST(date)
+      return `${jstDate.getMonth() + 1}月${jstDate.getDate()}日`
+    }
+    
+    const startStr = formatDate(startDate)
+    const endStr = formatDate(endDate)
+    
+    return { start: startStr, end: endStr }
+  }, [displayDate, isClient])
   
   // 時間枠選択モードに応じたスロット数を計算
   const getDurationSlots = useCallback((mode: DurationMode): number => {
@@ -90,11 +129,11 @@ export default function CalendarGrid({
         return date
       })
     }
-    const dates = getJSTWeekDates(currentDate)
+    const dates = getJSTWeekDates(displayDate)
     // console.log('Week dates:', dates.map((date, index) => `${index}: ${date.getDate()}日 (${['日', '月', '火', '水', '木', '金', '土'][date.getDay()]})`))
     // console.log('Week dates ISO:', dates.map((date, index) => `${index}: ${date.toISOString()}`))
     return dates
-  }, [currentDate, isClient])
+  }, [displayDate, isClient])
   
   const weekdays = ['日', '月', '火', '水', '木', '金', '土']
   
@@ -447,6 +486,48 @@ export default function CalendarGrid({
           </div>
         </div>
       </div>
+      
+      {/* 週ナビゲーション */}
+      {showWeekNavigation && (
+        <div className="px-4 py-3 border-b border-gray-100 bg-gray-50">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-3">
+              <button
+                onClick={goToPreviousWeek}
+                className="flex items-center px-3 py-1.5 text-sm font-medium text-gray-600 bg-white border border-gray-300 rounded-md hover:bg-gray-50 hover:text-gray-700 transition-colors"
+                aria-label="前の週"
+              >
+                <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                </svg>
+                前週
+              </button>
+              
+              <button
+                onClick={goToCurrentWeek}
+                className="px-3 py-1.5 text-sm font-medium text-blue-600 bg-blue-50 border border-blue-200 rounded-md hover:bg-blue-100 transition-colors"
+              >
+                今週
+              </button>
+              
+              <button
+                onClick={goToNextWeek}
+                className="flex items-center px-3 py-1.5 text-sm font-medium text-gray-600 bg-white border border-gray-300 rounded-md hover:bg-gray-50 hover:text-gray-700 transition-colors"
+                aria-label="次の週"
+              >
+                翌週
+                <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </button>
+            </div>
+            
+            <div className="text-sm font-medium text-gray-700">
+              {getWeekRange().start} - {getWeekRange().end}
+            </div>
+          </div>
+        </div>
+      )}
       
       {/* 週ヘッダー */}
       <div className="grid grid-cols-8 border-b border-gray-100 bg-gradient-to-r from-gray-50 to-white">
