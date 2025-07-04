@@ -101,29 +101,31 @@ export default function SchedulePage({ params }: Props) {
   }
 
   return (
-    <div data-testid="schedule-page" className="min-h-screen bg-gray-50 py-4">
+    <div data-testid="schedule-page" className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100 py-6">
       <div className="max-w-5xl mx-auto px-4">
-        <header className="mb-4">
-          <h1 className="text-xl font-bold text-gray-900 mb-2">スケジュール表示</h1>
+        <header className="mb-6">
+          <h1 className="text-2xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent mb-3">スケジュール表示</h1>
           {isExpired && (
-            <div data-testid="expired-label" className="inline-block bg-red-100 text-red-700 px-2 py-1 rounded text-xs font-medium">
+            <div data-testid="expired-label" className="inline-block bg-gradient-to-r from-red-500 to-rose-600 text-white px-3 py-1.5 rounded-full text-xs font-semibold shadow-lg">
               期限切れ
             </div>
           )}
         </header>
 
-        <main className="bg-white rounded-lg shadow-sm border p-4">
-          <section className="mb-4">
-            <h2 className="text-lg font-semibold text-gray-800 mb-2">スケジュール</h2>
+        <main className="bg-white rounded-2xl shadow-2xl border-0 ring-1 ring-slate-200/50 p-6">
+          <section className="mb-6">
+            <h2 className="text-lg font-semibold text-slate-800 mb-3">スケジュール</h2>
             <CalendarGrid schedule={schedule} showWeekNavigation={true} />
           </section>
 
-          <section className="mb-4">
-            <h2 className="text-sm font-semibold text-gray-800 mb-1">コメント</h2>
-            <p className="text-gray-600 text-sm leading-relaxed">{schedule.comment}</p>
+          <section className="mb-6">
+            <h2 className="text-sm font-semibold text-slate-800 mb-2">コメント</h2>
+            <div className="bg-gradient-to-r from-slate-50 to-gray-50 p-4 rounded-xl border border-slate-200">
+              <p className="text-slate-700 text-sm leading-relaxed">{schedule.comment}</p>
+            </div>
           </section>
 
-          <footer className="text-xs text-gray-500 space-y-1">
+          <footer className="text-xs text-slate-500 space-y-2 bg-slate-50 p-3 rounded-xl">
             <p>作成: {formatDate(schedule.createdAt)}</p>
             <p>有効期限: {formatDate(schedule.expiresAt)}</p>
           </footer>
