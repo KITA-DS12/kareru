@@ -10,6 +10,7 @@ import {
 } from '../../utils/timezone'
 import WeekNavigation from './WeekNavigation'
 import DurationSelector from './DurationSelector'
+import TimeSlotGrid from './TimeSlotGrid'
 
 type DurationMode = '30min' | '1h' | '3h' | '1day'
 
@@ -478,137 +479,16 @@ export default function CalendarGrid({
         />
       )}
       
-      {/* 週ヘッダー */}
-      <div className="grid grid-cols-8 border-b border-gray-600 bg-gray-800">
-        <div className="p-3 text-center font-medium text-gray-200 border-r border-gray-700 text-sm">
-          時刻
-        </div>
-        {weekDates.map((date, index) => {
-          const jstDate = utcToJST(date)
-          const isToday = todayColumnIndex === index
-          return (
-            <div 
-              key={`header-${date.toISOString()}`}
-              className={`p-3 text-center border-r border-gray-700 ${
-                isToday 
-                  ? 'bg-blue-600 text-white' 
-                  : 'text-gray-200'
-              }`}
-            >
-              <div className="text-xs font-medium">
-                {weekdays[jstDate.getDay()]}
-              </div>
-              <div className="text-lg font-medium">
-                {jstDate.getDate()}
-              </div>
-            </div>
-          )
-        })}
-      </div>
-      
       {/* タイムグリッド */}
-      <div 
-        ref={containerRef}
-        data-testid="time-grid-container"
-        className="relative overflow-y-auto h-[400px] bg-gray-900"
-      >
-        {/* 現在時刻インジケーター */}
-        {todayColumnIndex !== -1 && (
-          <div
-            data-testid="current-time-indicator"
-            className="absolute pointer-events-none z-20 bg-red-500"
-            style={{
-              left: `${12.5 + todayColumnIndex * 12.5}%`,
-              width: '12.5%',
-              top: `${getCurrentTimePosition()}px`,
-              height: '2px'
-            }}
-          >
-            <div className="absolute -left-1 -top-1 w-2 h-2 bg-red-500 rounded-full"></div>
-          </div>
-        )}
-        
-        {/* タイムスロット */}
-        <div className="grid grid-cols-8">
-          {timeSlots.map((slot, slotIndex) => (
-            <React.Fragment key={`slot-${slotIndex}`}>
-              {/* 時刻ラベル */}
-              <div 
-                className={`h-8 border-r border-gray-700 flex items-center justify-center text-xs font-medium text-gray-300 bg-gray-800 px-1 ${
-                  slot.minute === 0 
-                    ? 'border-b border-gray-600' 
-                    : 'border-b border-gray-800'
-                }`}
-                data-testid={`time-label-${slotIndex}`}
-              >
-                <span className="truncate text-center">{slot.timeRange}</span>
-              </div>
-              
-              {/* 各日のタイムスロット */}
-              {weekDates.map((date, dayIndex) => (
-                <div
-                  key={`day-${date.toISOString()}-slot-${slotIndex}`}
-                  data-testid={`time-slot-${date.getDate()}-${slotIndex}`}
-                  data-day-index={dayIndex}
-                  data-slot-index={slotIndex}
-                  data-time-start={`${slot.hour.toString().padStart(2, '0')}:${slot.minute.toString().padStart(2, '0')}`}
-                  className={`calendar-time-slot h-8 border-r border-gray-700 cursor-pointer relative group transition-colors ${
-                    // 既存のイベントがある場合は横線を表示しない
-                    schedule?.timeSlots?.some(timeSlot => 
-                      isSlotInTimeSlot(dayIndex, slotIndex, timeSlot)
-                    ) ? 'selected-available border border-green-600 bg-green-500/30' : (
-                      // 1時間単位（:00）は濃い線、半時間単位（:30）は薄い線
-                      slot.minute === 0 ? 'border-b border-gray-600' : 'border-b border-gray-800'
-                    )
-                  } ${
-                    // 今日の列をハイライト
-                    todayColumnIndex === dayIndex 
-                      ? 'bg-gray-800 hover:bg-gray-700' 
-                      : 'hover:bg-gray-800'
-                  }`}
-                  onClick={() => handleSlotClick(dayIndex, slotIndex)}
-                >
-                  {/* イベントバー */}
-                  {getOverlappingEvents(dayIndex)
-                    .filter(event => {
-                      const eventStart = new Date(event.StartTime)
-                      const jstEventStart = utcToJST(eventStart)
-                      const eventStartMinutes = jstEventStart.getHours() * 60 + jstEventStart.getMinutes()
-                      const slotStart = slot.hour * 60 + slot.minute
-                      const slotEnd = slotStart + 30
-                      return eventStartMinutes >= slotStart && eventStartMinutes < slotEnd
-                    })
-                    .map((event) => (
-                      <div
-                        key={`event-${event.id}-day-${dayIndex}-slot-${slotIndex}`}
-                        data-testid={`event-bar-${event.id}`}
-                        className="calendar-event-bar absolute text-white font-medium cursor-pointer bg-green-500 hover:bg-green-600 transition-colors border border-green-400"
-                        style={{
-                          ...getEventStyle(event, slotIndex),
-                          left: '2px',
-                          right: '2px',
-                          width: 'calc(100% - 4px)',
-                          borderRadius: '4px',
-                          border: '1px solid rgba(255,255,255,0.2)'
-                        }}
-                        onClick={(e) => {
-                          e.stopPropagation()
-                          handleEventClick(event)
-                        }}
-                        onMouseEnter={() => setHoveredEvent(event.id || null)}
-                        onMouseLeave={() => setHoveredEvent(null)}
-                      >
-                        <div className="truncate p-1 text-xs">
-                          {formatJSTTime(new Date(event.StartTime))} - {formatJSTTime(new Date(event.EndTime))}
-                        </div>
-                      </div>
-                    ))}
-                </div>
-              ))}
-            </React.Fragment>
-          ))}
-        </div>
-      </div>
+      <TimeSlotGrid
+        schedule={schedule}
+        weekDates={weekDates}
+        todayColumnIndex={todayColumnIndex}
+        onSlotClick={handleSlotClick}
+        onEventClick={handleEventClick}
+        hoveredEvent={hoveredEvent}
+        onEventHover={setHoveredEvent}
+      />
       
       {/* 編集モーダル */}
       {editingEvent && (
