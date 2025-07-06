@@ -1,18 +1,15 @@
-import React, { useState, useMemo, useCallback, useRef, useEffect } from 'react'
+import React, { useState, useMemo, useCallback, useRef } from 'react'
 import { Schedule, TimeSlot } from '../../types/schedule'
 import {
-  getJSTNow,
-  getJSTWeekDates,
   getCurrentJSTMinutes,
-  isJSTToday,
-  utcToJST,
-  formatJSTTime
+  utcToJST
 } from '../../utils/timezone'
 import WeekNavigation from './WeekNavigation'
 import DurationSelector from './DurationSelector'
 import TimeSlotGrid from './TimeSlotGrid'
 import EventEditor from './EventEditor'
 import useTimeSlotManagement from '../../hooks/useTimeSlotManagement'
+import useCalendarNavigation from '../../hooks/useCalendarNavigation'
 
 type DurationMode = '30min' | '1h' | '3h' | '1day'
 
@@ -46,8 +43,18 @@ export default function CalendarGrid({
   const [hoveredEvent, setHoveredEvent] = useState<string | null>(null)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const [durationMode, setDurationMode] = useState<DurationMode>('30min')
-  const [isClient, setIsClient] = useState(false)
-  const [displayDate, setDisplayDate] = useState(() => currentDate)
+  
+  // カレンダーナビゲーション管理フック
+  const {
+    displayDate,
+    goToPreviousWeek,
+    goToNextWeek,
+    goToCurrentWeek,
+    getWeekRange,
+    weekDates,
+    todayColumnIndex,
+    isClient
+  } = useCalendarNavigation(currentDate)
   
   // タイムスロット管理フック
   const {
@@ -61,46 +68,6 @@ export default function CalendarGrid({
   
   const containerRef = useRef<HTMLDivElement>(null)
   
-  // クライアントサイドでのみレンダリングを有効にする
-  useEffect(() => {
-    setIsClient(true)
-  }, [])
-
-  // 週ナビゲーション関数
-  const goToPreviousWeek = useCallback(() => {
-    const newDate = new Date(displayDate)
-    newDate.setDate(newDate.getDate() - 7)
-    setDisplayDate(newDate)
-  }, [displayDate])
-
-  const goToNextWeek = useCallback(() => {
-    const newDate = new Date(displayDate)
-    newDate.setDate(newDate.getDate() + 7)
-    setDisplayDate(newDate)
-  }, [displayDate])
-
-  const goToCurrentWeek = useCallback(() => {
-    setDisplayDate(new Date())
-  }, [])
-
-  // 週の範囲を取得する関数
-  const getWeekRange = useCallback(() => {
-    if (!isClient) return { start: '', end: '' }
-    
-    const dates = getJSTWeekDates(displayDate)
-    const startDate = dates[0] // 日曜日
-    const endDate = dates[6] // 土曜日
-    
-    const formatDate = (date: Date) => {
-      const jstDate = utcToJST(date)
-      return `${jstDate.getMonth() + 1}月${jstDate.getDate()}日`
-    }
-    
-    const startStr = formatDate(startDate)
-    const endStr = formatDate(endDate)
-    
-    return { start: startStr, end: endStr }
-  }, [displayDate, isClient])
   
   // 時間枠選択モードに応じたスロット数を計算
   const getDurationSlots = useCallback((mode: DurationMode): number => {
@@ -134,20 +101,6 @@ export default function CalendarGrid({
     return slots
   }, [])
   
-  // 週の日付を取得（日本時間ベース）
-  const weekDates = useMemo(() => {
-    if (!isClient) {
-      // サーバーサイドでは固定の日付を返してハイドレーションエラーを防ぐ
-      return Array.from({ length: 7 }, (_, i) => {
-        const date = new Date(2024, 0, 1 + i) // 固定日付
-        return date
-      })
-    }
-    const dates = getJSTWeekDates(displayDate)
-    // console.log('Week dates:', dates.map((date, index) => `${index}: ${date.getDate()}日 (${['日', '月', '火', '水', '木', '金', '土'][date.getDay()]})`))
-    // console.log('Week dates ISO:', dates.map((date, index) => `${index}: ${date.toISOString()}`))
-    return dates
-  }, [displayDate, isClient])
   
   const weekdays = ['日', '月', '火', '水', '木', '金', '土']
   
@@ -171,16 +124,6 @@ export default function CalendarGrid({
     return slotIndex * 32 + (minutes % 30) * (32 / 30)
   }, [])
   
-  // 今日の列インデックスを取得
-  const todayColumnIndex = useMemo(() => {
-    if (!isClient) return -1 // サーバーサイドでは非表示
-    const today = getJSTNow()
-    return weekDates.findIndex(date => {
-      const dateStr = utcToJST(date).toDateString()
-      const todayStr = today.toDateString()
-      return dateStr === todayStr
-    })
-  }, [weekDates, isClient])
   
   // 日付別のイベント取得
   const getOverlappingEvents = useCallback((dayIndex: number) => {
