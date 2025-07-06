@@ -101,30 +101,32 @@ export default function SchedulePage({ params }: Props) {
   }
 
   return (
-    <div data-testid="schedule-page" className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-2xl mx-auto px-4">
-        <header className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-4">スケジュール表示</h1>
+    <div data-testid="schedule-page" className="min-h-screen bg-gray-900 py-6">
+      <div className="max-w-5xl mx-auto px-4">
+        <header className="mb-6">
+          <h1 className="text-2xl font-bold text-gray-100 mb-3">スケジュール表示</h1>
           {isExpired && (
-            <div data-testid="expired-label" className="inline-block bg-red-100 text-red-700 px-3 py-1 rounded-full text-sm font-medium">
+            <div data-testid="expired-label" className="inline-block bg-red-600 text-white px-3 py-1.5 rounded text-xs font-medium">
               期限切れ
             </div>
           )}
         </header>
 
-        <main className="bg-white rounded-lg shadow-sm border p-6">
+        <main className="bg-gray-800 rounded-lg border border-gray-700 p-6">
           <section className="mb-6">
-            <h2 className="text-lg font-semibold text-gray-800 mb-2">コメント</h2>
-            <p className="text-gray-600 leading-relaxed">{schedule.comment}</p>
+            <h2 className="text-lg font-medium text-gray-200 mb-3">スケジュール</h2>
+            <CalendarGrid schedule={schedule} showWeekNavigation={true} />
           </section>
 
           <section className="mb-6">
-            <h2 className="text-lg font-semibold text-gray-800 mb-4">スケジュール</h2>
-            <CalendarGrid schedule={schedule} />
+            <h2 className="text-sm font-medium text-gray-200 mb-2">コメント</h2>
+            <div className="bg-gray-750 p-4 rounded-md border border-gray-600">
+              <p className="text-gray-100 text-sm leading-relaxed">{schedule.comment}</p>
+            </div>
           </section>
 
-          <footer className="text-sm text-gray-500 space-y-1">
-            <p>作成日時: {formatDate(schedule.createdAt)}</p>
+          <footer className="text-xs text-gray-400 space-y-2 bg-gray-700 p-3 rounded">
+            <p>作成: {formatDate(schedule.createdAt)}</p>
             <p>有効期限: {formatDate(schedule.expiresAt)}</p>
           </footer>
         </main>

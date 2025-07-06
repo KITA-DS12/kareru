@@ -101,9 +101,7 @@ export default function MonthView({ currentDate = new Date(), onDateSelect, sche
           <div
             key={slot.id || index}
             data-testid="schedule-indicator"
-            className={`w-2 h-1 rounded-full ${
-              slot.Available ? 'bg-green-500' : 'bg-red-500'
-            }`}
+            className="w-2 h-1 rounded-full bg-green-500"
           />
         ))}
       </div>

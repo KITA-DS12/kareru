@@ -19,6 +19,7 @@ interface CalendarGridProps {
   onCreateTimeSlotsWithMerge?: (timeSlots: Array<Omit<TimeSlot, 'id'>>) => void
   onUpdateTimeSlot?: (id: string, updates: Partial<TimeSlot>) => void
   onDeleteTimeSlot?: (id: string) => void
+  showWeekNavigation?: boolean
 }
 
 interface EditingEvent {
@@ -34,13 +35,15 @@ export default function CalendarGrid({
   onCreateTimeSlots,
   onCreateTimeSlotsWithMerge,
   onUpdateTimeSlot,
-  onDeleteTimeSlot
+  onDeleteTimeSlot,
+  showWeekNavigation = true
 }: CalendarGridProps) {
   const [editingEvent, setEditingEvent] = useState<EditingEvent | null>(null)
   const [hoveredEvent, setHoveredEvent] = useState<string | null>(null)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const [durationMode, setDurationMode] = useState<DurationMode>('30min')
   const [isClient, setIsClient] = useState(false)
+  const [displayDate, setDisplayDate] = useState(() => currentDate)
   
   const containerRef = useRef<HTMLDivElement>(null)
   
@@ -48,6 +51,42 @@ export default function CalendarGrid({
   useEffect(() => {
     setIsClient(true)
   }, [])
+
+  // 週ナビゲーション関数
+  const goToPreviousWeek = useCallback(() => {
+    const newDate = new Date(displayDate)
+    newDate.setDate(newDate.getDate() - 7)
+    setDisplayDate(newDate)
+  }, [displayDate])
+
+  const goToNextWeek = useCallback(() => {
+    const newDate = new Date(displayDate)
+    newDate.setDate(newDate.getDate() + 7)
+    setDisplayDate(newDate)
+  }, [displayDate])
+
+  const goToCurrentWeek = useCallback(() => {
+    setDisplayDate(new Date())
+  }, [])
+
+  // 週の範囲を取得する関数
+  const getWeekRange = useCallback(() => {
+    if (!isClient) return { start: '', end: '' }
+    
+    const dates = getJSTWeekDates(displayDate)
+    const startDate = dates[0] // 日曜日
+    const endDate = dates[6] // 土曜日
+    
+    const formatDate = (date: Date) => {
+      const jstDate = utcToJST(date)
+      return `${jstDate.getMonth() + 1}月${jstDate.getDate()}日`
+    }
+    
+    const startStr = formatDate(startDate)
+    const endStr = formatDate(endDate)
+    
+    return { start: startStr, end: endStr }
+  }, [displayDate, isClient])
   
   // 時間枠選択モードに応じたスロット数を計算
   const getDurationSlots = useCallback((mode: DurationMode): number => {
@@ -90,11 +129,11 @@ export default function CalendarGrid({
         return date
       })
     }
-    const dates = getJSTWeekDates(currentDate)
+    const dates = getJSTWeekDates(displayDate)
     // console.log('Week dates:', dates.map((date, index) => `${index}: ${date.getDate()}日 (${['日', '月', '火', '水', '木', '金', '土'][date.getDay()]})`))
     // console.log('Week dates ISO:', dates.map((date, index) => `${index}: ${date.toISOString()}`))
     return dates
-  }, [currentDate, isClient])
+  }, [displayDate, isClient])
   
   const weekdays = ['日', '月', '火', '水', '木', '金', '土']
   
@@ -111,11 +150,11 @@ export default function CalendarGrid({
       
       if (slotElement && containerRect) {
         const slotRect = slotElement.getBoundingClientRect()
-        return slotRect.top - containerRect.top + (minutes % 30) * (64 / 30)
+        return slotRect.top - containerRect.top + (minutes % 30) * (32 / 30)
       }
     }
     
-    return slotIndex * 64 + (minutes % 30) * (64 / 30)
+    return slotIndex * 32 + (minutes % 30) * (32 / 30)
   }, [])
   
   // 今日の列インデックスを取得
@@ -180,14 +219,14 @@ export default function CalendarGrid({
     
     // イベントの開始位置をスロット内での相対位置として計算
     const relativeStartMinutes = startMinutes - slotStartMinutes
-    const topPosition = (relativeStartMinutes / 30) * 64
+    const topPosition = (relativeStartMinutes / 30) * 32
     
-    const height = (duration / 30) * 64
+    const height = (duration / 30) * 32
     
     return {
-      top: `${Math.max(2, topPosition + 2)}px`,
-      height: `${Math.max(height - 4, 28)}px`,
-      minHeight: '28px'
+      top: `${Math.max(1, topPosition + 1)}px`,
+      height: `${Math.max(height - 2, 20)}px`,
+      minHeight: '20px'
     }
   }, [])
   
@@ -406,14 +445,14 @@ export default function CalendarGrid({
   // クライアントサイドでのみレンダリング
   if (!isClient) {
     return (
-      <div className="bg-white rounded-xl shadow-xl overflow-hidden border border-gray-100">
-        <div className="p-4 text-center text-gray-500">Loading calendar...</div>
+      <div className="bg-gray-900 rounded-lg overflow-hidden border border-gray-700">
+        <div className="p-4 text-center text-gray-300">Loading calendar...</div>
       </div>
     )
   }
 
   return (
-    <div className="bg-white rounded-xl shadow-xl overflow-hidden border border-gray-100">
+    <div className="bg-gray-900 rounded-lg overflow-hidden border border-gray-700">
       {/* エラーメッセージ */}
       {errorMessage && (
         <div className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-md mb-4">
@@ -422,23 +461,21 @@ export default function CalendarGrid({
       )}
       
       {/* 時間枠選択モード */}
-      <div className="p-4 border-b border-gray-100 bg-gray-50">
-        <div className="flex items-center justify-between">
-          <span className="text-sm font-medium text-gray-700">時間枠選択モード:</span>
-          <div className="flex space-x-2">
+      <div className="px-4 py-2 border-b border-gray-700 bg-gray-800">
+        <div className="flex items-center justify-end">
+          <div className="flex space-x-1">
             {(['30min', '1h', '3h', '1day'] as DurationMode[]).map((mode) => (
               <button
                 key={mode}
                 onClick={(e) => {
                   e.stopPropagation()
                   e.preventDefault()
-                  // console.log(`Duration mode changed from ${durationMode} to ${mode}`)
                   setDurationMode(mode)
                 }}
-                className={`px-3 py-1 text-sm rounded-md transition-colors ${
+                className={`px-3 py-2 text-xs font-medium rounded-lg transition-all duration-200 hover:scale-105 ${
                   durationMode === mode
-                    ? 'bg-emerald-500 text-white'
-                    : 'bg-white text-gray-600 hover:bg-gray-100 border border-gray-300'
+                    ? 'bg-slate-700 text-white shadow-lg hover:shadow-xl border border-slate-600 hover:bg-slate-800 dark:bg-slate-800 dark:hover:bg-slate-900 dark:border-slate-700'
+                    : 'bg-slate-500 text-white hover:text-white hover:bg-slate-600 border border-slate-400 shadow-md hover:shadow-lg dark:bg-slate-600 dark:hover:bg-slate-700 dark:border-slate-500'
                 }`}
               >
                 {mode}
@@ -448,9 +485,45 @@ export default function CalendarGrid({
         </div>
       </div>
       
+      {/* 週ナビゲーション */}
+      {showWeekNavigation && (
+        <div className="px-4 py-3 border-b border-gray-700 bg-gray-800">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-2">
+              <button
+                onClick={goToPreviousWeek}
+                className="w-14 h-12 flex items-center justify-center text-white bg-slate-600 hover:bg-slate-700 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 border border-slate-500 font-bold text-lg dark:bg-slate-700 dark:hover:bg-slate-800 dark:border-slate-600"
+                aria-label="前の週"
+              >
+                &lt;
+              </button>
+              
+              <button
+                onClick={goToCurrentWeek}
+                className="px-8 h-12 text-sm bg-slate-700 text-white hover:bg-slate-800 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 border border-slate-600 font-medium flex items-center justify-center dark:bg-slate-800 dark:hover:bg-slate-900 dark:border-slate-700"
+              >
+                今週
+              </button>
+              
+              <button
+                onClick={goToNextWeek}
+                className="w-14 h-12 flex items-center justify-center text-white bg-slate-600 hover:bg-slate-700 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 border border-slate-500 font-bold text-lg dark:bg-slate-700 dark:hover:bg-slate-800 dark:border-slate-600"
+                aria-label="次の週"
+              >
+                &gt;
+              </button>
+            </div>
+            
+            <div className="text-sm text-gray-200">
+              {getWeekRange().start} - {getWeekRange().end}
+            </div>
+          </div>
+        </div>
+      )}
+      
       {/* 週ヘッダー */}
-      <div className="grid grid-cols-8 border-b border-gray-100 bg-gradient-to-r from-gray-50 to-white">
-        <div className="p-4 text-center font-semibold text-gray-600 border-r border-gray-100">
+      <div className="grid grid-cols-8 border-b border-gray-600 bg-gray-800">
+        <div className="p-3 text-center font-medium text-gray-200 border-r border-gray-700 text-sm">
           時刻
         </div>
         {weekDates.map((date, index) => {
@@ -459,16 +532,16 @@ export default function CalendarGrid({
           return (
             <div 
               key={`header-${date.toISOString()}`}
-              className={`p-4 text-center border-r border-gray-100 transition-colors ${
+              className={`p-3 text-center border-r border-gray-700 ${
                 isToday 
-                  ? 'bg-blue-50 text-blue-700 font-bold' 
-                  : 'text-gray-700 hover:bg-gray-50'
+                  ? 'bg-blue-600 text-white' 
+                  : 'text-gray-200'
               }`}
             >
-              <div className="text-sm font-medium">
+              <div className="text-xs font-medium">
                 {weekdays[jstDate.getDay()]}
               </div>
-              <div className={`text-lg ${isToday ? 'font-bold' : 'font-medium'}`}>
+              <div className="text-lg font-medium">
                 {jstDate.getDate()}
               </div>
             </div>
@@ -480,21 +553,22 @@ export default function CalendarGrid({
       <div 
         ref={containerRef}
         data-testid="time-grid-container"
-        className="relative overflow-y-auto h-[600px] bg-gradient-to-b from-white to-gray-25"
+        className="relative overflow-y-auto h-[400px] bg-gray-900"
       >
         {/* 現在時刻インジケーター */}
         {todayColumnIndex !== -1 && (
           <div
             data-testid="current-time-indicator"
-            className="current-time-line absolute pointer-events-none z-10"
+            className="absolute pointer-events-none z-20 bg-red-500"
             style={{
               left: `${12.5 + todayColumnIndex * 12.5}%`,
               width: '12.5%',
               top: `${getCurrentTimePosition()}px`,
-              height: '2px',
-              borderRadius: '1px'
+              height: '2px'
             }}
-          />
+          >
+            <div className="absolute -left-1 -top-1 w-2 h-2 bg-red-500 rounded-full"></div>
+          </div>
         )}
         
         {/* タイムスロット */}
@@ -503,13 +577,14 @@ export default function CalendarGrid({
             <React.Fragment key={`slot-${slotIndex}`}>
               {/* 時刻ラベル */}
               <div 
-                className="h-16 border-r border-gray-200 bg-gray-50 flex items-center justify-center text-sm font-medium text-gray-600"
+                className={`h-8 border-r border-gray-700 flex items-center justify-center text-xs font-medium text-gray-300 bg-gray-800 px-1 ${
+                  slot.minute === 0 
+                    ? 'border-b border-gray-600' 
+                    : 'border-b border-gray-800'
+                }`}
                 data-testid={`time-label-${slotIndex}`}
               >
-                <div className="text-center">
-                  <div className="text-xs text-gray-500">{slot.label}</div>
-                  <div className="text-xs text-gray-400">{slot.timeRange}</div>
-                </div>
+                <span className="truncate text-center">{slot.timeRange}</span>
               </div>
               
               {/* 各日のタイムスロット */}
@@ -520,16 +595,19 @@ export default function CalendarGrid({
                   data-day-index={dayIndex}
                   data-slot-index={slotIndex}
                   data-time-start={`${slot.hour.toString().padStart(2, '0')}:${slot.minute.toString().padStart(2, '0')}`}
-                  className={`calendar-time-slot h-16 border-r border-gray-200 cursor-pointer relative group ${
-                    slotIndex % 2 === 0 ? 'border-b border-gray-100' : 'border-b border-dashed border-gray-100'
-                  } ${
-                    // 今日の列をハイライト
-                    todayColumnIndex === dayIndex ? 'bg-blue-25' : 'hover:bg-blue-50'
-                  } ${
-                    // 既存のイベントがある場合の緑枠表示
+                  className={`calendar-time-slot h-8 border-r border-gray-700 cursor-pointer relative group transition-colors ${
+                    // 既存のイベントがある場合は横線を表示しない
                     schedule?.timeSlots?.some(timeSlot => 
                       isSlotInTimeSlot(dayIndex, slotIndex, timeSlot)
-                    ) ? 'selected-available' : ''
+                    ) ? 'selected-available border border-green-600 bg-green-500/30' : (
+                      // 1時間単位（:00）は濃い線、半時間単位（:30）は薄い線
+                      slot.minute === 0 ? 'border-b border-gray-600' : 'border-b border-gray-800'
+                    )
+                  } ${
+                    // 今日の列をハイライト
+                    todayColumnIndex === dayIndex 
+                      ? 'bg-gray-800 hover:bg-gray-700' 
+                      : 'hover:bg-gray-800'
                   }`}
                   onClick={() => handleSlotClick(dayIndex, slotIndex)}
                 >
@@ -547,7 +625,7 @@ export default function CalendarGrid({
                       <div
                         key={`event-${event.id}-day-${dayIndex}-slot-${slotIndex}`}
                         data-testid={`event-bar-${event.id}`}
-                        className="calendar-event-bar absolute text-white font-medium cursor-pointer bg-emerald-500 hover:bg-emerald-600"
+                        className="calendar-event-bar absolute text-white font-medium cursor-pointer bg-green-500 hover:bg-green-600 transition-colors border border-green-400"
                         style={{
                           ...getEventStyle(event, slotIndex),
                           left: '2px',
@@ -577,15 +655,15 @@ export default function CalendarGrid({
       
       {/* 編集モーダル */}
       {editingEvent && (
-        <div className="fixed inset-0 bg-black bg-opacity-60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div data-testid="edit-modal" className="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-md">
-            <div className="flex items-center justify-between mb-6">
-              <h3 className="text-xl font-bold text-gray-900">タイムスロット編集</h3>
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div data-testid="edit-modal" className="bg-gray-800 rounded-lg p-6 w-full max-w-md border border-gray-600">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-medium text-gray-100">タイムスロット編集</h3>
               <button 
                 onClick={() => setEditingEvent(null)}
-                className="text-gray-400 hover:text-gray-600 transition-colors"
+                className="text-gray-400 hover:text-gray-200 transition-colors p-1"
               >
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                 </svg>
               </button>
@@ -593,41 +671,40 @@ export default function CalendarGrid({
             
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-white mb-2">
                   開始時刻
                 </label>
                 <input
                   type="datetime-local"
                   value={editingEvent.startTime}
                   onChange={(e) => setEditingEvent(prev => prev ? { ...prev, startTime: e.target.value } : null)}
-                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full p-3 border border-gray-600 rounded-md bg-gray-750 text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 focus:shadow-lg"
                 />
               </div>
               
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-white mb-2">
                   終了時刻
                 </label>
                 <input
                   type="datetime-local"
                   value={editingEvent.endTime}
                   onChange={(e) => setEditingEvent(prev => prev ? { ...prev, endTime: e.target.value } : null)}
-                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full p-3 border border-gray-600 rounded-md bg-gray-750 text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 focus:shadow-lg"
                 />
               </div>
-              
             </div>
             
-            <div className="flex space-x-3 mt-8">
+            <div className="flex space-x-3 mt-6">
               <button
                 onClick={handleEditSave}
-                className="flex-1 bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors font-medium"
+                className="flex-1 bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 focus:ring-2 focus:ring-blue-500 transition-all duration-200 font-medium shadow-md hover:shadow-lg"
               >
                 保存
               </button>
               <button
                 onClick={handleDelete}
-                className="flex-1 bg-green-600 text-white py-3 px-4 rounded-lg hover:bg-green-700 focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-colors font-medium"
+                className="flex-1 bg-red-500 text-white py-2 px-4 rounded-md hover:bg-red-600 focus:ring-2 focus:ring-red-500 transition-all duration-200 font-medium shadow-md hover:shadow-lg"
               >
                 削除
               </button>

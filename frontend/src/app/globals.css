@@ -2,18 +2,56 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Google Calendar UI Styles */
-.bg-white { background-color: #ffffff !important; }
-.bg-gray-25 { background-color: #fafbfc !important; }
-.bg-gray-50 { background-color: #f8f9fa !important; }
-.bg-gray-100 { background-color: #f1f3f4 !important; }
-.bg-gray-200 { background-color: #e8eaed !important; }
-.bg-gray-300 { background-color: #dadce0 !important; }
+/* Dark mode base styles */
+html, body {
+  background-color: #111827;
+  color: #f3f4f6;
+}
+
+body {
+  min-height: 100vh;
+}
+
+/* Google Calendar UI Styles - Dark Mode Override */
+.bg-white { background-color: #1f2937 !important; }
+.bg-gray-25 { background-color: #1f2937 !important; }
+.bg-gray-50 { background-color: #1f2937 !important; }
+.bg-gray-100 { background-color: #374151 !important; }
+.bg-gray-200 { background-color: #4b5563 !important; }
+.bg-gray-300 { background-color: #6b7280 !important; }
+.bg-gray-750 { background-color: #374151 !important; }
 .bg-blue-25 { background-color: #f8fbff !important; }
 .bg-blue-50 { background-color: #e8f0fe !important; }
 .bg-blue-100 { background-color: #d2e3fc !important; }
 .bg-blue-500 { background-color: #4285f4 !important; }
 .bg-emerald-500 { background-color: #34a853 !important; }
+.bg-emerald-600 { background-color: #059669 !important; }
+.bg-emerald-700 { background-color: #047857 !important; }
+.bg-indigo-600 { background-color: #4f46e5 !important; }
+.bg-indigo-700 { background-color: #4338ca !important; }
+.bg-indigo-800 { background-color: #3730a3 !important; }
+.bg-teal-600 { background-color: #0d9488 !important; }
+.bg-teal-700 { background-color: #0f766e !important; }
+.bg-teal-800 { background-color: #115e59 !important; }
+.bg-violet-600 { background-color: #7c3aed !important; }
+.bg-violet-700 { background-color: #6d28d9 !important; }
+.bg-violet-800 { background-color: #5b21b6 !important; }
+.bg-cyan-600 { background-color: #0891b2 !important; }
+.bg-cyan-700 { background-color: #0e7490 !important; }
+.bg-cyan-800 { background-color: #155e75 !important; }
+.bg-orange-600 { background-color: #ea580c !important; }
+.bg-orange-700 { background-color: #c2410c !important; }
+.bg-orange-800 { background-color: #9a3412 !important; }
+.bg-rose-500 { background-color: #f43f5e !important; }
+.bg-rose-600 { background-color: #e11d48 !important; }
+.bg-rose-700 { background-color: #be185d !important; }
+.bg-amber-100 { background-color: #fef3c7 !important; }
+.bg-amber-800 { background-color: #92400e !important; }
+.bg-slate-500 { background-color: #64748b !important; }
+.bg-slate-600 { background-color: #475569 !important; }
+.bg-slate-700 { background-color: #334155 !important; }
+.bg-slate-800 { background-color: #1e293b !important; }
+.bg-slate-900 { background-color: #0f172a !important; }
 
 .rounded-xl { border-radius: 0.75rem !important; }
 .shadow-xl { box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1) !important; }
@@ -26,6 +64,22 @@
 .border-r { border-right-width: 1px !important; }
 .border-blue-400 { border-color: #4285f4 !important; }
 .border-blue-500 { border-color: #4285f4 !important; }
+.border-indigo-500 { border-color: #6366f1 !important; }
+.border-indigo-600 { border-color: #4f46e5 !important; }
+.border-teal-500 { border-color: #14b8a6 !important; }
+.border-teal-600 { border-color: #0d9488 !important; }
+.border-violet-500 { border-color: #8b5cf6 !important; }
+.border-violet-600 { border-color: #7c3aed !important; }
+.border-cyan-500 { border-color: #06b6d4 !important; }
+.border-cyan-600 { border-color: #0891b2 !important; }
+.border-orange-500 { border-color: #f97316 !important; }
+.border-orange-600 { border-color: #ea580c !important; }
+.border-amber-300 { border-color: #fcd34d !important; }
+.border-amber-600 { border-color: #d97706 !important; }
+.border-slate-400 { border-color: #94a3b8 !important; }
+.border-slate-500 { border-color: #64748b !important; }
+.border-slate-600 { border-color: #475569 !important; }
+.border-slate-700 { border-color: #334155 !important; }
 
 .grid { display: grid !important; }
 .grid-cols-8 { grid-template-columns: repeat(8, minmax(0, 1fr)) !important; }
@@ -52,10 +106,10 @@
 .font-medium { font-weight: 500 !important; }
 .font-bold { font-weight: 700 !important; }
 
-.text-gray-500 { color: #9aa0a6 !important; }
-.text-gray-600 { color: #5f6368 !important; }
-.text-gray-700 { color: #3c4043 !important; }
-.text-gray-800 { color: #202124 !important; }
+.text-gray-500 { color: #9ca3af !important; }
+.text-gray-600 { color: #d1d5db !important; }
+.text-gray-700 { color: #e5e7eb !important; }
+.text-gray-800 { color: #f3f4f6 !important; }
 .text-blue-600 { color: #1a73e8 !important; }
 .text-blue-700 { color: #1967d2 !important; }
 .text-white { color: #ffffff !important; }
@@ -94,9 +148,27 @@
 .transition-all { transition-property: all !important; transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1) !important; }
 .duration-200 { transition-duration: 200ms !important; }
 
-.hover\:bg-gray-25:hover { background-color: #fafbfc !important; }
+.hover\:bg-gray-25:hover { background-color: #374151 !important; }
 .hover\:bg-blue-25:hover { background-color: #f8fbff !important; }
 .hover\:bg-blue-50:hover { background-color: #e8f0fe !important; }
+.hover\:bg-emerald-700:hover { background-color: #047857 !important; }
+.hover\:bg-emerald-800:hover { background-color: #065f46 !important; }
+.hover\:bg-indigo-700:hover { background-color: #4338ca !important; }
+.hover\:bg-indigo-800:hover { background-color: #3730a3 !important; }
+.hover\:bg-teal-700:hover { background-color: #0f766e !important; }
+.hover\:bg-teal-800:hover { background-color: #115e59 !important; }
+.hover\:bg-violet-700:hover { background-color: #6d28d9 !important; }
+.hover\:bg-violet-800:hover { background-color: #5b21b6 !important; }
+.hover\:bg-cyan-700:hover { background-color: #0e7490 !important; }
+.hover\:bg-cyan-800:hover { background-color: #155e75 !important; }
+.hover\:bg-orange-700:hover { background-color: #c2410c !important; }
+.hover\:bg-orange-800:hover { background-color: #9a3412 !important; }
+.hover\:bg-rose-600:hover { background-color: #e11d48 !important; }
+.hover\:bg-rose-700:hover { background-color: #be185d !important; }
+.hover\:bg-slate-600:hover { background-color: #475569 !important; }
+.hover\:bg-slate-700:hover { background-color: #334155 !important; }
+.hover\:bg-slate-800:hover { background-color: #1e293b !important; }
+.hover\:bg-slate-900:hover { background-color: #0f172a !important; }
 .hover\:border-blue-200:hover { border-color: #aecbfa !important; }
 .hover\:shadow-lg:hover { box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1) !important; }
 .transform { transform: translateX(var(--tw-translate-x)) translateY(var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y)) !important; }
@@ -131,13 +203,14 @@
 }
 
 .calendar-time-slot:hover {
-  background-color: #f8fbff;
-  border-color: #aecbfa;
+  background-color: #374151;
+  border-color: #4b5563;
 }
 
 /* Time slot selection states */
 .calendar-time-slot.selected-available {
-  background-color: rgba(52, 168, 83, 0.1) !important;
+  background-color: rgba(34, 197, 94, 0.3) !important;
+  border: 1px solid #16a34a !important;
   box-sizing: border-box !important;
 }
 
@@ -242,11 +315,15 @@
   border-radius: 4px;
   font-size: 12px;
   line-height: 1.2;
-  padding: 2px 4px;
+  padding: 2px 6px;
   margin: 0;
   box-shadow: 0 1px 3px rgba(0,0,0,0.1);
   transition: all 0.2s ease-in-out;
   box-sizing: border-box;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-align: left;
 }
 
 .calendar-event-bar:hover {

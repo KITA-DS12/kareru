@@ -145,7 +145,7 @@ export function useScheduleForm() {
     setError('')
 
     if (timeSlots.length === 0) {
-      setError('時間スロットを追加してください')
+      setError('カレンダーから利用可能な時間を選択してください')
       return false
     }
 
