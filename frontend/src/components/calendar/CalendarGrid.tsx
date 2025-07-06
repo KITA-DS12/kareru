@@ -9,6 +9,7 @@ import {
   formatJSTTime
 } from '../../utils/timezone'
 import WeekNavigation from './WeekNavigation'
+import DurationSelector from './DurationSelector'
 
 type DurationMode = '30min' | '1h' | '3h' | '1day'
 
@@ -462,29 +463,10 @@ export default function CalendarGrid({
       )}
       
       {/* 時間枠選択モード */}
-      <div className="px-4 py-2 border-b border-gray-700 bg-gray-800">
-        <div className="flex items-center justify-end">
-          <div className="flex space-x-1">
-            {(['30min', '1h', '3h', '1day'] as DurationMode[]).map((mode) => (
-              <button
-                key={mode}
-                onClick={(e) => {
-                  e.stopPropagation()
-                  e.preventDefault()
-                  setDurationMode(mode)
-                }}
-                className={`px-3 py-2 text-xs font-medium rounded-lg transition-all duration-200 hover:scale-105 ${
-                  durationMode === mode
-                    ? 'bg-slate-700 text-white shadow-lg hover:shadow-xl border border-slate-600 hover:bg-slate-800 dark:bg-slate-800 dark:hover:bg-slate-900 dark:border-slate-700'
-                    : 'bg-slate-500 text-white hover:text-white hover:bg-slate-600 border border-slate-400 shadow-md hover:shadow-lg dark:bg-slate-600 dark:hover:bg-slate-700 dark:border-slate-500'
-                }`}
-              >
-                {mode}
-              </button>
-            ))}
-          </div>
-        </div>
-      </div>
+      <DurationSelector
+        currentMode={durationMode}
+        onDurationChange={setDurationMode}
+      />
       
       {/* 週ナビゲーション */}
       {showWeekNavigation && (
