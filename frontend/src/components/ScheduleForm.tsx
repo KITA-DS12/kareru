@@ -102,7 +102,7 @@ export default function ScheduleForm() {
                   type="text"
                   value={scheduleUrl}
                   readOnly
-                  className="flex-1 p-2 bg-gray-750 border border-gray-600 rounded-md text-sm text-gray-100"
+                  className="flex-1 p-2 bg-gray-750 border border-gray-600 rounded-md text-sm text-white"
                 />
                 <button
                   onClick={() => copyToClipboard(scheduleUrl)}
@@ -120,11 +120,11 @@ export default function ScheduleForm() {
                   type="text"
                   value={editUrl}
                   readOnly
-                  className="flex-1 p-2 bg-gray-750 border border-gray-600 rounded-md text-sm text-gray-100"
+                  className="flex-1 p-2 bg-gray-750 border border-gray-600 rounded-md text-sm text-white"
                 />
                 <button
                   onClick={() => copyToClipboard(editUrl)}
-                  className="px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 text-sm shadow-md hover:shadow-lg transition-all duration-200"
+                  className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 text-sm shadow-md hover:shadow-lg transition-all duration-200"
                 >
                   コピー
                 </button>

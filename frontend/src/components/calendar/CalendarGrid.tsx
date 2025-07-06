@@ -671,7 +671,7 @@ export default function CalendarGrid({
             
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-200 mb-2">
+                <label className="block text-sm font-medium text-white mb-2">
                   開始時刻
                 </label>
                 <input
@@ -683,7 +683,7 @@ export default function CalendarGrid({
               </div>
               
               <div>
-                <label className="block text-sm font-medium text-gray-200 mb-2">
+                <label className="block text-sm font-medium text-white mb-2">
                   終了時刻
                 </label>
                 <input
