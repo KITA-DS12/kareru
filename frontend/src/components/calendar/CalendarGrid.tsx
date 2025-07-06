@@ -12,6 +12,7 @@ import WeekNavigation from './WeekNavigation'
 import DurationSelector from './DurationSelector'
 import TimeSlotGrid from './TimeSlotGrid'
 import EventEditor from './EventEditor'
+import useTimeSlotManagement from '../../hooks/useTimeSlotManagement'
 
 type DurationMode = '30min' | '1h' | '3h' | '1day'
 
@@ -42,12 +43,21 @@ export default function CalendarGrid({
   onDeleteTimeSlot,
   showWeekNavigation = true
 }: CalendarGridProps) {
-  const [editingEvent, setEditingEvent] = useState<EditingEvent | null>(null)
   const [hoveredEvent, setHoveredEvent] = useState<string | null>(null)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const [durationMode, setDurationMode] = useState<DurationMode>('30min')
   const [isClient, setIsClient] = useState(false)
   const [displayDate, setDisplayDate] = useState(() => currentDate)
+  
+  // タイムスロット管理フック
+  const {
+    editingEvent,
+    setEditingEvent,
+    handleEventClick,
+    handleEditSave,
+    handleDelete,
+    hasTimeRangeOverlap
+  } = useTimeSlotManagement(schedule?.timeSlots || [], onUpdateTimeSlot, onDeleteTimeSlot)
   
   const containerRef = useRef<HTMLDivElement>(null)
   
@@ -252,21 +262,6 @@ export default function CalendarGrid({
     return slotStartMinutes >= eventStartMinutes && slotStartMinutes < eventEndMinutes
   }, [weekDates])
   
-  // 時間範囲の重複チェック関数
-  const hasTimeRangeOverlap = useCallback((startDate: Date, startTime: string, endDate: Date, endTime: string) => {
-    if (!schedule?.timeSlots) return false
-    
-    const newStart = new Date(`${startDate.getFullYear()}-${String(startDate.getMonth() + 1).padStart(2, '0')}-${String(startDate.getDate()).padStart(2, '0')}T${startTime}`)
-    const newEnd = new Date(`${endDate.getFullYear()}-${String(endDate.getMonth() + 1).padStart(2, '0')}-${String(endDate.getDate()).padStart(2, '0')}T${endTime}`)
-    
-    return schedule.timeSlots.some(timeSlot => {
-      const existingStart = new Date(timeSlot.StartTime)
-      const existingEnd = new Date(timeSlot.EndTime)
-      
-      // 重複条件: 新規開始時刻が既存終了時刻より前 かつ 新規終了時刻が既存開始時刻より後
-      return newStart < existingEnd && newEnd > existingStart
-    })
-  }, [schedule?.timeSlots])
   
   // エラーメッセージの自動非表示
   React.useEffect(() => {
@@ -414,37 +409,6 @@ export default function CalendarGrid({
       })
     }
   }, [onCreateTimeSlot, onCreateTimeSlots, onCreateTimeSlotsWithMerge, weekDates, schedule?.timeSlots, isSlotInTimeSlot, weekdays, durationMode, getDurationSlots])
-  
-  // イベントクリック処理
-  const handleEventClick = useCallback((event: TimeSlot) => {
-    if (!event.id) return
-    
-    setEditingEvent({
-      id: event.id,
-      startTime: event.StartTime,
-      endTime: event.EndTime
-    })
-  }, [])
-  
-  // 編集の保存
-  const handleEditSave = useCallback(() => {
-    if (!editingEvent || !onUpdateTimeSlot) return
-    
-    onUpdateTimeSlot(editingEvent.id, {
-      StartTime: editingEvent.startTime,
-      EndTime: editingEvent.endTime
-    })
-    
-    setEditingEvent(null)
-  }, [editingEvent, onUpdateTimeSlot])
-  
-  // 削除処理
-  const handleDelete = useCallback(() => {
-    if (!editingEvent || !onDeleteTimeSlot) return
-    
-    onDeleteTimeSlot(editingEvent.id)
-    setEditingEvent(null)
-  }, [editingEvent, onDeleteTimeSlot])
   
   // クライアントサイドでのみレンダリング
   if (!isClient) {
