@@ -126,7 +126,6 @@ export function slotIndexToJSTDate(dayDate: Date, slotIndex: number): Date {
   const dateString = `${jstDate.getFullYear()}-${String(jstDate.getMonth() + 1).padStart(2, '0')}-${String(jstDate.getDate()).padStart(2, '0')}T${String(hours).padStart(2, '0')}:${String(mins).padStart(2, '0')}:00+09:00`
   const result = new Date(dateString)
   
-  console.log(`slotIndexToJSTDate Debug: dayDate=${dayDate.toISOString()}, jstDate=${jstDate.toISOString()}, slotIndex=${slotIndex}, result=${result.toISOString()}`)
   
   return result
 }
@@ -143,17 +142,3 @@ export function formatJSTTime(date: Date): string {
   })
 }
 
-/**
- * デバッグ用：現在の時刻情報を表示
- */
-export function debugTimeInfo() {
-  const systemNow = new Date()
-  const jstNow = getJSTNow()
-  
-  console.log('=== TIME DEBUG INFO ===')
-  console.log('System time:', systemNow.toISOString())
-  console.log('JST time:', jstNow.toISOString())
-  console.log('JST formatted:', formatJSTTime(systemNow))
-  console.log('Current JST minutes:', getCurrentJSTMinutes())
-  console.log('======================')
-}

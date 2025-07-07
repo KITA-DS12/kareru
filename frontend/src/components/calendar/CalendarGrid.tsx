@@ -139,23 +139,10 @@ export default function CalendarGrid({
       
       const isMatch = jstEventStart.toDateString() === jstDayDate.toDateString()
       
-      if (dayIndex === 3) { // 水曜日（今テストしている日）のログを出力
-        // console.log(`DEBUG: Event filter for day ${dayIndex}:`)
-        // console.log(`  TimeSlot: ${timeSlot.StartTime} - ${timeSlot.EndTime}`)
-        // console.log(`  EventStart JST: ${jstEventStart.toDateString()}`)
-        // console.log(`  DayDate JST: ${jstDayDate.toDateString()}`)
-        // console.log(`  Match: ${isMatch}`)
-      }
       
       return isMatch
     })
     
-    if (dayIndex === 3) {
-      // console.log(`DEBUG: Filtered events for day ${dayIndex}: ${filteredEvents.length}`)
-      // console.log(`DEBUG: All timeSlots in schedule:`, schedule?.timeSlots?.map(slot => 
-      //   `${slot.StartTime} - ${slot.EndTime}`
-      // ))
-    }
     
     return filteredEvents
   }, [schedule?.timeSlots, weekDates])
@@ -218,7 +205,6 @@ export default function CalendarGrid({
   
   // 時間枠選択モードに応じたクリック処理
   const handleSlotClick = useCallback((dayIndex: number, slotIndex: number) => {
-    // console.log(`DEBUG: handleSlotClick called with dayIndex=${dayIndex}, slotIndex=${slotIndex}, mode=${durationMode}`)
     if (!onCreateTimeSlot) return
     
     const dayDate = weekDates[dayIndex]
@@ -248,19 +234,15 @@ export default function CalendarGrid({
     const slotsToCreate = getDurationSlots(durationMode)
     const endSlotIndex = slotIndex + slotsToCreate
     
-    // console.log(`Slot Click: dayIndex=${dayIndex}, slotIndex=${slotIndex}, mode=${durationMode}, slots=${slotsToCreate}`)
     
     // 日をまたぐかどうかチェック（48スロット = 24時間、インデックス0-47）
     if (endSlotIndex >= 48) {
-      // console.log(`DEBUG: Cross-day detected - startSlot=${slotIndex}, endSlot=${endSlotIndex}, slotsToCreate=${slotsToCreate}`)
-      // console.log(`DEBUG: dayDate=${dayDate.toISOString()}, jstDayDate=${jstDayDate.toISOString()}`)
       
       // 日をまたぐ場合：当日分と翌日分に分割
       const todayEndSlot = 48
       const tomorrowStartSlot = 0
       const tomorrowEndSlot = endSlotIndex - 48
       
-      // console.log(`DEBUG: Split - today: ${slotIndex}-${todayEndSlot}, tomorrow: ${tomorrowStartSlot}-${tomorrowEndSlot}`)
       
       // 当日分と翌日分の時間計算
       const startHours = Math.floor(slotIndex / 2)
@@ -276,7 +258,6 @@ export default function CalendarGrid({
       const todayStartTimeStr = `${jstDayDate.getFullYear()}-${String(jstDayDate.getMonth() + 1).padStart(2, '0')}-${String(jstDayDate.getDate()).padStart(2, '0')}T${String(startHours).padStart(2, '0')}:${String(startMinutes).padStart(2, '0')}:00`
       const todayEndTimeStr = `${jstDayDate.getFullYear()}-${String(jstDayDate.getMonth() + 1).padStart(2, '0')}-${String(jstDayDate.getDate()).padStart(2, '0')}T23:59:00`
       
-      // console.log(`Cross-day today: ${todayStartTimeStr} - ${todayEndTimeStr}`)
       
       // 翌日分を作成（00:00～終了時刻）
       if (nextDayIndex < weekDates.length) {
@@ -288,7 +269,6 @@ export default function CalendarGrid({
         const tomorrowStartTimeStr = `${jstNextDayDate.getFullYear()}-${String(jstNextDayDate.getMonth() + 1).padStart(2, '0')}-${String(jstNextDayDate.getDate()).padStart(2, '0')}T00:00:00`
         const tomorrowEndTimeStr = `${jstNextDayDate.getFullYear()}-${String(jstNextDayDate.getMonth() + 1).padStart(2, '0')}-${String(jstNextDayDate.getDate()).padStart(2, '0')}T${String(endHours).padStart(2, '0')}:${String(endMinutes).padStart(2, '0')}:00`
         
-        // console.log(`Cross-day tomorrow: ${tomorrowStartTimeStr} - ${tomorrowEndTimeStr}`)
         
         // 両方のタイムスロットを一度に作成（重複時は自動マージ）
         if (onCreateTimeSlotsWithMerge) {
