@@ -1,4 +1,5 @@
 import { CreateScheduleResponse, Schedule, FormSchedule } from '../types/schedule'
+import { isCreateScheduleResponse, isSchedule } from '../utils/runtime-type-check'
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080'
 
@@ -21,7 +22,13 @@ export async function createSchedule(schedule: Omit<FormSchedule, 'id' | 'editTo
     throw new Error(`HTTP error! status: ${response.status}`)
   }
 
-  return response.json()
+  const data = await response.json()
+  
+  if (!isCreateScheduleResponse(data)) {
+    throw new Error('Invalid API response format for createSchedule')
+  }
+  
+  return data
 }
 
 export async function getSchedule(id: string): Promise<Schedule> {
@@ -31,7 +38,13 @@ export async function getSchedule(id: string): Promise<Schedule> {
     throw new Error(`HTTP error! status: ${response.status}`)
   }
 
-  return response.json()
+  const data = await response.json()
+  
+  if (!isSchedule(data)) {
+    throw new Error('Invalid API response format for getSchedule')
+  }
+  
+  return data
 }
 
 export async function getScheduleByToken(token: string): Promise<Schedule> {
@@ -41,7 +54,13 @@ export async function getScheduleByToken(token: string): Promise<Schedule> {
     throw new Error(`HTTP error! status: ${response.status}`)
   }
 
-  return response.json()
+  const data = await response.json()
+  
+  if (!isSchedule(data)) {
+    throw new Error('Invalid API response format for getScheduleByToken')
+  }
+  
+  return data
 }
 
 export async function updateSchedule(token: string, schedule: Omit<Schedule, 'id' | 'editToken' | 'createdAt' | 'expiresAt'>): Promise<Schedule> {
@@ -64,7 +83,13 @@ export async function updateSchedule(token: string, schedule: Omit<Schedule, 'id
     throw new Error(`HTTP error! status: ${response.status}`)
   }
 
-  return response.json()
+  const data = await response.json()
+  
+  if (!isSchedule(data)) {
+    throw new Error('Invalid API response format for updateSchedule')
+  }
+  
+  return data
 }
 
 export async function deleteSchedule(token: string): Promise<void> {
