@@ -385,7 +385,7 @@ export default function CalendarGrid({
           onSave={handleEditSave}
           onDelete={handleDelete}
           onClose={() => setEditingEvent(null)}
-          onUpdate={(updates) => setEditingEvent(prev => prev ? { ...prev, ...updates } : null)}
+          onUpdate={(updates) => setEditingEvent((prev: EditingEvent | null) => prev ? { ...prev, ...updates } : null)}
         />
       )}
     </div>

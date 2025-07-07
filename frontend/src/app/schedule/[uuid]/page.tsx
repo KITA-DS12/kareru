@@ -126,8 +126,8 @@ export default function SchedulePage({ params }: Props) {
           </section>
 
           <footer className="text-xs text-gray-400 space-y-2 bg-gray-700 p-3 rounded">
-            <p>作成: {formatDate(schedule.createdAt)}</p>
-            <p>有効期限: {formatDate(schedule.expiresAt)}</p>
+            <p>作成: {schedule.createdAt ? formatDate(schedule.createdAt) : '不明'}</p>
+            <p>有効期限: {schedule.expiresAt ? formatDate(schedule.expiresAt) : '不明'}</p>
           </footer>
         </main>
       </div>
