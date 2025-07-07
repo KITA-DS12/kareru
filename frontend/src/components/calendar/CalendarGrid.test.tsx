@@ -52,9 +52,9 @@ describe('CalendarGrid Component', () => {
     it('should highlight today column', () => {
       render(<CalendarGrid />)
       
-      // 2025年7月15日は火曜日
-      const todayColumn = screen.getByTestId('day-column-2') // 火曜日（0=日曜日）
-      expect(todayColumn).toHaveClass('bg-gradient-to-b')
+      // 2025年7月15日は火曜日のヘッダー部分がハイライトされる
+      const todayHeader = screen.getByText('15').parentElement
+      expect(todayHeader).toHaveClass('bg-blue-600')
     })
   })
 
