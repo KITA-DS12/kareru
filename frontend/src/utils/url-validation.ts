@@ -1,3 +1,5 @@
+import { BUSINESS_CONSTANTS } from '../constants'
+
 /**
  * UUID v4の形式を検証する
  * @param uuid 検証対象の値（unknown型で任意の値を受け取る）
@@ -8,7 +10,7 @@ export function isValidUUID(uuid: unknown): boolean {
     return false
   }
   
-  const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
+  const uuidRegex = new RegExp(`^[0-9a-f]{8}-[0-9a-f]{4}-${BUSINESS_CONSTANTS.UUID_VERSION}[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$`, 'i')
   return uuidRegex.test(uuid)
 }
 
@@ -22,7 +24,7 @@ export function isValidEditToken(token: unknown): boolean {
     return false
   }
   
-  const tokenRegex = /^[0-9a-f]{64}$/i
+  const tokenRegex = new RegExp(`^[0-9a-f]{${BUSINESS_CONSTANTS.EDIT_TOKEN_LENGTH}}$`, 'i')
   return tokenRegex.test(token)
 }
 
