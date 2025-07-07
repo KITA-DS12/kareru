@@ -1,7 +1,9 @@
 /**
  * UUID v4の形式を検証する
+ * @param uuid 検証対象の値（unknown型で任意の値を受け取る）
+ * @returns UUIDとして有効かどうか
  */
-export function isValidUUID(uuid: any): boolean {
+export function isValidUUID(uuid: unknown): boolean {
   if (typeof uuid !== 'string') {
     return false
   }
@@ -12,8 +14,10 @@ export function isValidUUID(uuid: any): boolean {
 
 /**
  * 編集トークンの形式を検証する（64文字の16進数）
+ * @param token 検証対象の値（unknown型で任意の値を受け取る）
+ * @returns 編集トークンとして有効かどうか
  */
-export function isValidEditToken(token: any): boolean {
+export function isValidEditToken(token: unknown): boolean {
   if (typeof token !== 'string') {
     return false
   }
