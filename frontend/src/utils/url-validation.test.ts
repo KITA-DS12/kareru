@@ -15,9 +15,22 @@ describe('URL Validation Utils', () => {
     })
 
     it('should return false for non-string input', () => {
-      expect(isValidUUID(null as any)).toBe(false)
-      expect(isValidUUID(undefined as any)).toBe(false)
-      expect(isValidUUID(123 as any)).toBe(false)
+      expect(isValidUUID(null as unknown)).toBe(false)
+      expect(isValidUUID(undefined as unknown)).toBe(false)
+      expect(isValidUUID(123 as unknown)).toBe(false)
+    })
+
+    it('should handle unknown type inputs safely', () => {
+      // 型安全性テスト: unknown型への変更後も正しく動作する
+      const unknownInputs: unknown[] = [
+        null, undefined, 123, true, [], {}, Symbol('test'), 
+        new Date(), /regex/, () => {}, new Map(), new Set()
+      ]
+      
+      unknownInputs.forEach(input => {
+        expect(() => isValidUUID(input)).not.toThrow()
+        expect(isValidUUID(input)).toBe(false)
+      })
     })
   })
 
@@ -38,6 +51,19 @@ describe('URL Validation Utils', () => {
       const longToken = '5b521bc840d1b9d806dc97cb8efb5d6a41d0e737379fcd591f485e27b54f48faa'
       expect(isValidEditToken(shortToken)).toBe(false)
       expect(isValidEditToken(longToken)).toBe(false)
+    })
+
+    it('should handle unknown type inputs safely', () => {
+      // 型安全性テスト: unknown型への変更後も正しく動作する
+      const unknownInputs: unknown[] = [
+        null, undefined, 123, true, [], {}, Symbol('test'),
+        new Date(), /regex/, () => {}, new Map(), new Set()
+      ]
+      
+      unknownInputs.forEach(input => {
+        expect(() => isValidEditToken(input)).not.toThrow()
+        expect(isValidEditToken(input)).toBe(false)
+      })
     })
   })
 

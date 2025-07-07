@@ -1,4 +1,5 @@
 import React from 'react'
+import { DURATION_MODES } from '../../constants'
 
 type DurationMode = '30min' | '1h' | '3h' | '1day'
 
@@ -11,7 +12,12 @@ export default function DurationSelector({
   currentMode,
   onDurationChange
 }: DurationSelectorProps) {
-  const modes: DurationMode[] = ['30min', '1h', '3h', '1day']
+  const modes: DurationMode[] = [
+    DURATION_MODES.THIRTY_MINUTES,
+    DURATION_MODES.ONE_HOUR,
+    DURATION_MODES.THREE_HOURS,
+    DURATION_MODES.ONE_DAY
+  ]
 
   const handleModeChange = (mode: DurationMode, event: React.MouseEvent) => {
     event.stopPropagation()

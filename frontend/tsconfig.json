@@ -8,6 +8,8 @@
     "allowJs": true,
     "skipLibCheck": true,
     "strict": false,
+    "noImplicitAny": true,
+    "types": ["jest", "node"],
     "noEmit": true,
     "incremental": true,
     "esModuleInterop": true,
