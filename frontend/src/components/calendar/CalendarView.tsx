@@ -26,7 +26,7 @@ export default function CalendarView({ currentDate = new Date(), onDateSelect, s
     if (viewMode === mode) {
       return `${baseClasses} bg-blue-600 text-white`
     }
-    return `${baseClasses} bg-rose-500 text-white hover:bg-rose-600 dark:bg-rose-600 dark:hover:bg-rose-700`
+    return `${baseClasses} bg-gray-200 text-gray-700 hover:bg-gray-300 dark:bg-gray-600 dark:text-gray-300 dark:hover:bg-gray-500`
   }, [viewMode])
 
   const renderCurrentView = useMemo(() => {

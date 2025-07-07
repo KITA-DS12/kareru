@@ -1,0 +1,90 @@
+name: 課題報告・機能要求
+description: 新しい課題や機能要求を報告する際に使用してください
+title: "[ISSUE] "
+labels: ["needs-triage"]
+body:
+  - type: textarea
+    id: task-overview
+    attributes:
+      label: タスクの概要
+      description: この課題または機能要求の概要を記述してください
+      placeholder: 何を解決したいか、どのような機能を追加したいかを簡潔に説明してください
+    validations:
+      required: true
+
+  - type: textarea
+    id: completion-criteria
+    attributes:
+      label: 完了条件
+      description: このタスクが完了したと判断する条件を明確に記述してください
+      placeholder: |
+        例：
+        - [ ] 機能Aが実装されている
+        - [ ] テストが通る
+        - [ ] ドキュメントが更新されている
+    validations:
+      required: true
+
+  - type: textarea
+    id: related-info
+    attributes:
+      label: 関連情報
+      description: 関連するURL、Issue、PR、参考資料などがあれば記載してください
+      placeholder: |
+        例：
+        - 関連Issue: #123
+        - 参考URL: https://example.com
+        - 関連PR: #456
+    validations:
+      required: false
+
+  - type: textarea
+    id: concerns
+    attributes:
+      label: 懸念事項
+      description: 実装や解決において懸念される点があれば記載してください
+      placeholder: |
+        例：
+        - パフォーマンスへの影響
+        - 既存機能への影響
+        - セキュリティリスク
+        - 技術的な制約
+    validations:
+      required: false
+
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: その他
+      description: 上記に当てはまらない追加情報があれば記載してください
+      placeholder: スクリーンショット、ログ、環境情報など
+    validations:
+      required: false
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: 優先度
+      description: この課題の優先度を選択してください
+      options:
+        - 低（Low）
+        - 中（Medium）
+        - 高（High）
+        - 緊急（Critical）
+    validations:
+      required: true
+
+  - type: dropdown
+    id: issue-type
+    attributes:
+      label: 課題の種類
+      description: この課題の種類を選択してください
+      options:
+        - バグ修正
+        - 新機能
+        - 改善・最適化
+        - ドキュメント
+        - テスト
+        - その他
+    validations:
+      required: true
