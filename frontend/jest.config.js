@@ -12,6 +12,8 @@ const customJestConfig = {
   clearMocks: true,
   resetMocks: true,
   restoreMocks: true,
+  // タイムゾーンをJSTに固定してCI環境での一貫性を保つ
+  setupFiles: ['<rootDir>/jest.timezone.js'],
 }
 
 module.exports = createJestConfig(customJestConfig)

@@ -54,7 +54,7 @@ describe('CalendarGrid Component', () => {
       
       // 2025年7月15日は火曜日
       const todayColumn = screen.getByTestId('day-column-2') // 火曜日（0=日曜日）
-      expect(todayColumn).toHaveClass('bg-gradient-to-b')
+      expect(todayColumn).toHaveClass('bg-blue-600', 'text-white', 'bg-gradient-to-b')
     })
   })
 
@@ -62,20 +62,20 @@ describe('CalendarGrid Component', () => {
     const mockTimeSlots: TimeSlot[] = [
       {
         id: '1',
-        StartTime: '2025-07-15T10:00:00',
-        EndTime: '2025-07-15T11:30:00',
+        StartTime: '2025-07-15T01:00:00Z', // JST 10:00
+        EndTime: '2025-07-15T02:30:00Z',   // JST 11:30
         Available: true
       },
       {
         id: '2',
-        StartTime: '2025-07-15T14:00:00',
-        EndTime: '2025-07-15T15:00:00',
+        StartTime: '2025-07-15T05:00:00Z', // JST 14:00
+        EndTime: '2025-07-15T06:00:00Z',   // JST 15:00
         Available: false
       },
       {
         id: '3',
-        StartTime: '2025-07-16T10:00:00',
-        EndTime: '2025-07-16T10:30:00',
+        StartTime: '2025-07-16T01:00:00Z', // JST 10:00
+        EndTime: '2025-07-16T01:30:00Z',   // JST 10:30
         Available: true
       }
     ]
@@ -216,8 +216,8 @@ describe('CalendarGrid Component', () => {
       comment: 'テスト',
       timeSlots: [{
         id: '1',
-        StartTime: '2025-07-15T10:00:00',
-        EndTime: '2025-07-15T11:00:00',
+        StartTime: '2025-07-15T01:00:00Z', // JST 10:00
+        EndTime: '2025-07-15T02:00:00Z',   // JST 11:00
         Available: true
       }]
     }
@@ -269,8 +269,8 @@ describe('CalendarGrid Component', () => {
       comment: 'リサイズテスト',
       timeSlots: [{
         id: '1',
-        StartTime: '2025-07-15T10:00:00',
-        EndTime: '2025-07-15T11:00:00',
+        StartTime: '2025-07-15T01:00:00Z', // JST 10:00
+        EndTime: '2025-07-15T02:00:00Z',   // JST 11:00
         Available: true
       }]
     }
