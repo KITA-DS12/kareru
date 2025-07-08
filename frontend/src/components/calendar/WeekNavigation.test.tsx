@@ -5,10 +5,12 @@ describe('WeekNavigation', () => {
   const mockGoToPreviousWeek = jest.fn()
   const mockGoToCurrentWeek = jest.fn()
   const mockGoToNextWeek = jest.fn()
-  const mockGetWeekRange = jest.fn().mockReturnValue({ start: '7月6日', end: '7月12日' })
+  const mockGetWeekRange = jest.fn()
 
   beforeEach(() => {
     jest.clearAllMocks()
+    // モックの戻り値を毎回再設定
+    mockGetWeekRange.mockReturnValue({ start: '7月6日', end: '7月12日' })
   })
 
   it('週ナビゲーションボタンが表示される', () => {

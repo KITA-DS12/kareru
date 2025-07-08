@@ -71,7 +71,7 @@ jobs:
         cache-dependency-path: frontend/package-lock.json
         
     - name: Install dependencies
-      run: cd frontend && npm ci
+      run: cd frontend && npm ci --no-audit --no-fund
       
     - name: Run frontend lint
       run: cd frontend && npm run lint
@@ -80,7 +80,7 @@ jobs:
       run: cd frontend && npx tsc --project tsconfig.typecheck.json --noEmit --skipLibCheck
       
     - name: Run frontend tests
-      run: cd frontend && npm test -- --watchAll=false --verbose
+      run: cd frontend && npm test -- --watchAll=false --runInBand --forceExit
       
     - name: Build frontend
       run: cd frontend && npm run build
