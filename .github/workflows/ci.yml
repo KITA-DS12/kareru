@@ -81,7 +81,7 @@ jobs:
       run: cd frontend && npm run lint
       
     - name: Run frontend tests
-      run: cd frontend && npm test -- --coverage --watchAll=false
+      run: cd frontend && npm test -- --watchAll=false
       
     - name: Build frontend
       run: cd frontend && npm run build
