@@ -76,6 +76,9 @@ jobs:
     - name: Run frontend lint
       run: cd frontend && npm run lint
       
+    - name: Run TypeScript type check (excluding test files)
+      run: cd frontend && npx tsc --project tsconfig.typecheck.json --noEmit --skipLibCheck
+      
     - name: Run frontend tests
       run: cd frontend && npm test -- --watchAll=false
       

@@ -203,7 +203,7 @@ export default function CalendarGrid({
       const endTimeStr = `${jstDayDate.getFullYear()}-${String(jstDayDate.getMonth() + 1).padStart(2, '0')}-${String(jstDayDate.getDate()).padStart(2, '0')}T23:59:00`
       
       // 1日全体の選択状態を更新
-      const allDaySlots = []
+      const allDaySlots: Array<{ dayIndex: number; slotIndex: number }> = []
       for (let i = 0; i < 48; i++) {
         allDaySlots.push({ dayIndex, slotIndex: i })
       }
@@ -313,7 +313,7 @@ export default function CalendarGrid({
     const endTimeStr = `${jstDayDate.getFullYear()}-${String(jstDayDate.getMonth() + 1).padStart(2, '0')}-${String(jstDayDate.getDate()).padStart(2, '0')}T${endTime}`
     
     // 選択状態を更新
-    const newSlots = []
+    const newSlots: Array<{ dayIndex: number; slotIndex: number }> = []
     for (let i = 0; i < slotsToCreate; i++) {
       newSlots.push({ dayIndex, slotIndex: slotIndex + i })
     }
