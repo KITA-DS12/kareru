@@ -2,6 +2,7 @@ export interface TimeSlot {
   id?: string
   StartTime: string
   EndTime: string
+  Available?: boolean
 }
 
 export interface FormTimeSlot {
