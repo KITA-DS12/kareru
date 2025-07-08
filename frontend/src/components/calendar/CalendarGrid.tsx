@@ -7,7 +7,6 @@ import {
 import WeekNavigation from './WeekNavigation'
 import DurationSelector from './DurationSelector'
 import TimeSlotGrid from './TimeSlotGrid'
-import EventEditor from './EventEditor'
 import useTimeSlotManagement from '../../hooks/useTimeSlotManagement'
 import useCalendarNavigation from '../../hooks/useCalendarNavigation'
 
@@ -19,16 +18,9 @@ interface CalendarGridProps {
   onCreateTimeSlot?: (timeSlot: Omit<TimeSlot, 'id'>) => void
   onCreateTimeSlots?: (timeSlots: Array<Omit<TimeSlot, 'id'>>) => void
   onCreateTimeSlotsWithMerge?: (timeSlots: Array<Omit<TimeSlot, 'id'>>) => void
-  onUpdateTimeSlot?: (id: string, updates: Partial<TimeSlot>) => void
-  onDeleteTimeSlot?: (id: string) => void
   showWeekNavigation?: boolean
 }
 
-interface EditingEvent {
-  id: string
-  startTime: string
-  endTime: string
-}
 
 export default function CalendarGrid({
   schedule,
@@ -36,13 +28,12 @@ export default function CalendarGrid({
   onCreateTimeSlot,
   onCreateTimeSlots,
   onCreateTimeSlotsWithMerge,
-  onUpdateTimeSlot,
-  onDeleteTimeSlot,
   showWeekNavigation = true
 }: CalendarGridProps) {
   const [hoveredEvent, setHoveredEvent] = useState<string | null>(null)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const [durationMode, setDurationMode] = useState<DurationMode>('30min')
+  const [selectedSlots, setSelectedSlots] = useState<Array<{ dayIndex: number; slotIndex: number }>>([])
   
   // カレンダーナビゲーション管理フック
   const {
@@ -58,13 +49,8 @@ export default function CalendarGrid({
   
   // タイムスロット管理フック
   const {
-    editingEvent,
-    setEditingEvent,
-    handleEventClick,
-    handleEditSave,
-    handleDelete,
     hasTimeRangeOverlap
-  } = useTimeSlotManagement(schedule?.timeSlots || [], onUpdateTimeSlot, onDeleteTimeSlot)
+  } = useTimeSlotManagement(schedule?.timeSlots || [])
   
   const containerRef = useRef<HTMLDivElement>(null)
   
@@ -216,6 +202,13 @@ export default function CalendarGrid({
       const startTimeStr = `${jstDayDate.getFullYear()}-${String(jstDayDate.getMonth() + 1).padStart(2, '0')}-${String(jstDayDate.getDate()).padStart(2, '0')}T00:00:00`
       const endTimeStr = `${jstDayDate.getFullYear()}-${String(jstDayDate.getMonth() + 1).padStart(2, '0')}-${String(jstDayDate.getDate()).padStart(2, '0')}T23:59:00`
       
+      // 1日全体の選択状態を更新
+      const allDaySlots = []
+      for (let i = 0; i < 48; i++) {
+        allDaySlots.push({ dayIndex, slotIndex: i })
+      }
+      setSelectedSlots(prev => [...prev, ...allDaySlots])
+      
       if (onCreateTimeSlotsWithMerge) {
         onCreateTimeSlotsWithMerge([{
           StartTime: startTimeStr,
@@ -319,6 +312,13 @@ export default function CalendarGrid({
     const startTimeStr = `${jstDayDate.getFullYear()}-${String(jstDayDate.getMonth() + 1).padStart(2, '0')}-${String(jstDayDate.getDate()).padStart(2, '0')}T${startTime}`
     const endTimeStr = `${jstDayDate.getFullYear()}-${String(jstDayDate.getMonth() + 1).padStart(2, '0')}-${String(jstDayDate.getDate()).padStart(2, '0')}T${endTime}`
     
+    // 選択状態を更新
+    const newSlots = []
+    for (let i = 0; i < slotsToCreate; i++) {
+      newSlots.push({ dayIndex, slotIndex: slotIndex + i })
+    }
+    setSelectedSlots(prev => [...prev, ...newSlots])
+    
     // 重複時は自動マージで作成
     if (onCreateTimeSlotsWithMerge) {
       onCreateTimeSlotsWithMerge([{
@@ -331,7 +331,7 @@ export default function CalendarGrid({
         EndTime: endTimeStr
       })
     }
-  }, [onCreateTimeSlot, onCreateTimeSlots, onCreateTimeSlotsWithMerge, weekDates, schedule?.timeSlots, isSlotInTimeSlot, weekdays, durationMode, getDurationSlots])
+  }, [onCreateTimeSlot, onCreateTimeSlots, onCreateTimeSlotsWithMerge, weekDates, durationMode, getDurationSlots])
   
   // クライアントサイドでのみレンダリング
   if (!isClient) {
@@ -373,21 +373,10 @@ export default function CalendarGrid({
         weekDates={weekDates}
         todayColumnIndex={todayColumnIndex}
         onSlotClick={handleSlotClick}
-        onEventClick={handleEventClick}
         hoveredEvent={hoveredEvent}
         onEventHover={setHoveredEvent}
+        selectedSlots={selectedSlots}
       />
-      
-      {/* 編集モーダル */}
-      {editingEvent && (
-        <EventEditor
-          editingEvent={editingEvent}
-          onSave={handleEditSave}
-          onDelete={handleDelete}
-          onClose={() => setEditingEvent(null)}
-          onUpdate={(updates) => setEditingEvent(prev => prev ? { ...prev, ...updates } : null)}
-        />
-      )}
     </div>
   )
 }

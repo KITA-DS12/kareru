@@ -338,26 +338,4 @@ describe('useScheduleForm', () => {
     })
   })
 
-  describe('updateTimeSlot', () => {
-    it('指定されたIDの時間スロットを更新する', () => {
-      const { result } = renderHook(() => useScheduleForm())
-
-      // 時間スロットを追加
-      act(() => {
-        result.current.addTimeSlot('2025-07-04T10:00:00', '2025-07-04T11:00:00')
-      })
-
-      const slotId = result.current.timeSlots[0].id
-
-      // 開始時刻を更新
-      act(() => {
-        result.current.updateTimeSlot(slotId, 'startTime', '2025-07-04T09:00:00')
-      })
-
-      expect(result.current.timeSlots[0]).toMatchObject({
-        startTime: '2025-07-04T09:00:00',
-        endTime: '2025-07-04T11:00:00'
-      })
-    })
-  })
 })
