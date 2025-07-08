@@ -110,18 +110,3 @@ func TestScheduleRepository_GetByID_NotFound(t *testing.T) {
 	assert.Error(t, err)
 }
 
-func TestScheduleRepository_ValidateEditToken(t *testing.T) {
-	t.Skip("実装前のため一時的にスキップ")
-}
-
-func TestScheduleRepository_GetExpired(t *testing.T) {
-	t.Skip("実装前のため一時的にスキップ")
-}
-
-func TestScheduleRepository_Update(t *testing.T) {
-	t.Skip("実装前のため一時的にスキップ")
-}
-
-func TestScheduleRepository_Delete(t *testing.T) {
-	t.Skip("実装前のため一時的にスキップ")
-}

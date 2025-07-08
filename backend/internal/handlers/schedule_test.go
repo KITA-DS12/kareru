@@ -55,6 +55,18 @@ func (m *MockScheduleRepository) Update(schedule *model.Schedule) error {
 	return nil
 }
 
+func (m *MockScheduleRepository) GetByEditToken(token string) (*model.Schedule, error) {
+	if m.getErr != nil {
+		return nil, m.getErr
+	}
+	for _, schedule := range m.schedules {
+		if schedule.EditToken == token {
+			return schedule, nil
+		}
+	}
+	return nil, nil
+}
+
 func (m *MockScheduleRepository) Delete(id string) error {
 	if m.deleteErr != nil {
 		return m.deleteErr
@@ -104,25 +116,6 @@ func TestCreateSchedule(t *testing.T) {
 		assert.Len(t, response.TimeSlots, 1)
 	})
 
-	t.Run("作成されたスケジュールにUUIDと編集トークンが設定される", func(t *testing.T) {
-		// 実装前のため一時的にスキップ
-		t.Skip("実装前のため一時的にスキップ")
-	})
-
-	t.Run("レスポンスに作成されたスケジュール情報が含まれる", func(t *testing.T) {
-		// 実装前のため一時的にスキップ  
-		t.Skip("実装前のため一時的にスキップ")
-	})
-
-	t.Run("無効なタイムスロット（重複）でエラーを返す", func(t *testing.T) {
-		// 実装前のため一時的にスキップ
-		t.Skip("実装前のため一時的にスキップ")
-	})
-
-	t.Run("無効なタイムスロット（開始時刻 > 終了時刻）でエラーを返す", func(t *testing.T) {
-		// 実装前のため一時的にスキップ
-		t.Skip("実装前のため一時的にスキップ")
-	})
 }
 
 func TestGetSchedule(t *testing.T) {
@@ -167,15 +160,6 @@ func TestGetSchedule(t *testing.T) {
 		assert.Len(t, response.TimeSlots, 1)
 	})
 
-	t.Run("存在しないUUIDで404エラーを返す", func(t *testing.T) {
-		// 実装前のため一時的にスキップ
-		t.Skip("実装前のため一時的にスキップ")
-	})
-
-	t.Run("無効なUUID形式で400エラーを返す", func(t *testing.T) {
-		// 実装前のため一時的にスキップ
-		t.Skip("実装前のため一時的にスキップ")
-	})
 
 	t.Run("失効したスケジュールで410エラーを返す", func(t *testing.T) {
 		router := gin.New()
@@ -261,21 +245,6 @@ func TestUpdateSchedule(t *testing.T) {
 		assert.Len(t, response.TimeSlots, 1)
 	})
 
-	t.Run("間違った編集トークンで403エラーを返す", func(t *testing.T) {
-		// 実装前のため一時的にスキップ
-		t.Skip("実装前のため一時的にスキップ")
-	})
-
-	t.Run("編集トークンなしで401エラーを返す", func(t *testing.T) {
-		// 実装前のため一時的にスキップ
-		t.Skip("実装前のため一時的にスキップ")
-	})
-
-	t.Run("存在しないUUIDで404エラーを返す", func(t *testing.T) {
-		// 実装前のため一時的にスキップ
-		t.Skip("実装前のため一時的にスキップ")
-	})
-
 	t.Run("失効したスケジュールで410エラーを返す", func(t *testing.T) {
 		router := gin.New()
 		mockRepo := NewMockScheduleRepository()
@@ -316,10 +285,6 @@ func TestUpdateSchedule(t *testing.T) {
 		assert.Contains(t, response["error"], "schedule has expired")
 	})
 
-	t.Run("無効なタイムスロットで400エラーを返す", func(t *testing.T) {
-		// 実装前のため一時的にスキップ
-		t.Skip("実装前のため一時的にスキップ")
-	})
 }
 
 func TestDeleteSchedule(t *testing.T) {
@@ -362,20 +327,6 @@ func TestDeleteSchedule(t *testing.T) {
 		assert.False(t, exists)
 	})
 
-	t.Run("間違った編集トークンで403エラーを返す", func(t *testing.T) {
-		// 実装前のため一時的にスキップ
-		t.Skip("実装前のため一時的にスキップ")
-	})
-
-	t.Run("編集トークンなしで401エラーを返す", func(t *testing.T) {
-		// 実装前のため一時的にスキップ
-		t.Skip("実装前のため一時的にスキップ")
-	})
-
-	t.Run("存在しないUUIDで404エラーを返す", func(t *testing.T) {
-		// 実装前のため一時的にスキップ
-		t.Skip("実装前のため一時的にスキップ")
-	})
 	
 	t.Run("失効したスケジュールで410エラーを返す", func(t *testing.T) {
 		router := gin.New()

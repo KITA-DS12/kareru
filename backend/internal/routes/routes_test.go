@@ -56,6 +56,18 @@ func (m *MockScheduleRepository) Update(schedule *model.Schedule) error {
 	return nil
 }
 
+func (m *MockScheduleRepository) GetByEditToken(token string) (*model.Schedule, error) {
+	if m.getErr != nil {
+		return nil, m.getErr
+	}
+	for _, schedule := range m.schedules {
+		if schedule.EditToken == token {
+			return schedule, nil
+		}
+	}
+	return nil, nil
+}
+
 func (m *MockScheduleRepository) Delete(id string) error {
 	if m.deleteErr != nil {
 		return m.deleteErr
