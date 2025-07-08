@@ -30,7 +30,6 @@ backend/go.work
 backend/*.coverprofile
 backend/coverage.txt
 backend/coverage.html
-backend/coverage.out
 
 # Node.js
 frontend/node_modules/
