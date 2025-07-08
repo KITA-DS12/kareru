@@ -147,14 +147,36 @@ export default function TimeSlotGrid({
                   }`}
                   onClick={() => onSlotClick(dayIndex, slotIndex)}
                 >
-                  {/* イベントバー（該当時間の場合のみ） */}
+                  {/* イベントが存在する時間帯の背景色を変更 */}
+                  {schedule?.timeSlots?.some(event => {
+                    const eventStartDate = new Date(event.StartTime)
+                    const eventEndDate = new Date(event.EndTime)
+                    const jstEventStartDate = utcToJST(eventStartDate)
+                    const jstEventEndDate = utcToJST(eventEndDate)
+                    const jstSlotDate = utcToJST(weekDates[dayIndex])
+                    
+                    // 同じ日付のイベントのみ対象
+                    if (jstEventStartDate.toDateString() !== jstSlotDate.toDateString()) return false
+                    
+                    const eventStartMinutes = jstEventStartDate.getHours() * 60 + jstEventStartDate.getMinutes()
+                    const eventEndMinutes = jstEventEndDate.getHours() * 60 + jstEventEndDate.getMinutes()
+                    const slotStartMinutes = slot.hour * 60 + slot.minute
+                    const slotEndMinutes = slotStartMinutes + 30
+                    
+                    // スロットがイベントの時間範囲内にあるかチェック
+                    return slotStartMinutes < eventEndMinutes && slotEndMinutes > eventStartMinutes
+                  }) && (
+                    <div className="absolute inset-0 bg-green-500 opacity-30"></div>
+                  )}
+                  
+                  {/* イベントバー（開始時間の場合のみ表示） */}
                   {schedule?.timeSlots
                     ?.filter(event => {
                       const eventDate = new Date(event.StartTime)
                       const jstEventDate = utcToJST(eventDate)
                       const jstSlotDate = utcToJST(weekDates[dayIndex])
                       
-                      // 同じ日かつ該当スロット時間内の場合のみ表示
+                      // 同じ日かつ開始時刻が該当スロット時間内の場合のみ表示
                       if (jstEventDate.toDateString() !== jstSlotDate.toDateString()) return false
                       
                       const eventStartMinutes = jstEventDate.getHours() * 60 + jstEventDate.getMinutes()
