@@ -1,22 +1,46 @@
 import { render, screen, waitFor } from '@testing-library/react'
 import SchedulePage from './page'
 import { getSchedule } from '../../../services/api'
+import { validateScheduleURL } from '../../../utils/url-validation'
+import { notFound } from 'next/navigation'
 
 jest.mock('../../../services/api', () => ({
   getSchedule: jest.fn(),
 }))
 
+jest.mock('../../../utils/url-validation', () => ({
+  validateScheduleURL: jest.fn(),
+}))
+
+jest.mock('next/navigation', () => ({
+  notFound: jest.fn(),
+}))
+
 const mockGetSchedule = getSchedule as jest.MockedFunction<typeof getSchedule>
+const mockValidateScheduleURL = validateScheduleURL as jest.MockedFunction<typeof validateScheduleURL>
+const mockNotFound = notFound as jest.MockedFunction<typeof notFound>
 
 describe('SchedulePage', () => {
   beforeEach(() => {
     jest.clearAllMocks()
+    // デフォルトで有効なUUIDとして扱う
+    mockValidateScheduleURL.mockReturnValue({ isValid: true, error: null })
   })
 
   it('UUID付きURLでページがレンダリングされる', async () => {
+    mockGetSchedule.mockReturnValue(new Promise(() => {}))
+    
     const mockParams = { uuid: 'test-uuid-123' }
     render(<SchedulePage params={mockParams} />)
     expect(screen.getByTestId('schedule-page')).toBeInTheDocument()
+  })
+
+  it('should call notFound for invalid uuid', () => {
+    mockValidateScheduleURL.mockReturnValue({ isValid: false, error: 'Invalid UUID format' })
+    
+    render(<SchedulePage params={{ uuid: 'invalid-uuid' }} />)
+    
+    expect(mockNotFound).toHaveBeenCalled()
   })
 
   it('スケジュールデータを取得して表示する', async () => {
@@ -41,7 +65,7 @@ describe('SchedulePage', () => {
       expect(screen.getByText('テスト用スケジュール')).toBeInTheDocument()
     })
     
-    expect(screen.getByTestId('time-slot-list')).toBeInTheDocument()
+    expect(screen.getByTestId('time-grid-container')).toBeInTheDocument()
   })
 
   it('期限切れスケジュールに「期限切れ」ラベルを表示する', async () => {

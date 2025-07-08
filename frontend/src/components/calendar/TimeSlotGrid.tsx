@@ -76,9 +76,10 @@ export default function TimeSlotGrid({
           return (
             <div 
               key={`header-${date.toISOString()}`}
+              data-testid={`day-column-${index}`}
               className={`p-3 text-center border-r border-gray-700 ${
                 isToday 
-                  ? 'bg-blue-600 text-white' 
+                  ? 'bg-blue-600 text-white bg-gradient-to-b' 
                   : 'text-gray-200'
               }`}
             >
@@ -103,7 +104,7 @@ export default function TimeSlotGrid({
         {todayColumnIndex !== -1 && (
           <div
             data-testid="current-time-indicator"
-            className="absolute pointer-events-none z-20 bg-red-500"
+            className="absolute pointer-events-none z-20 bg-red-500 bg-gradient-to-r"
             style={{
               left: `${12.5 + todayColumnIndex * 12.5}%`,
               width: '12.5%',
@@ -190,7 +191,11 @@ export default function TimeSlotGrid({
                     <div
                       key={`event-${event.id}-day-${dayIndex}-slot-${slotIndex}`}
                       data-testid={`event-bar-${event.id}`}
-                      className="calendar-event-bar absolute text-white font-medium cursor-pointer bg-green-500 hover:bg-green-600 transition-colors border border-green-400"
+                      className={`calendar-event-bar absolute text-white font-medium cursor-pointer transition-colors border ${
+                        event.Available 
+                          ? 'bg-gradient-to-r from-emerald-500 to-emerald-600 border-emerald-400 hover:from-emerald-600 hover:to-emerald-700'
+                          : 'bg-gradient-to-r from-red-500 to-red-600 border-red-400 hover:from-red-600 hover:to-red-700'
+                      }`}
                       style={{
                         top: '2px',
                         left: '2px',
