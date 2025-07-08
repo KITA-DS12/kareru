@@ -135,11 +135,6 @@ export function useScheduleForm() {
     setTimeSlots(timeSlots.filter(slot => slot.id !== id))
   }
 
-  const updateTimeSlot = (id: string, field: 'startTime' | 'endTime', value: string) => {
-    setTimeSlots(timeSlots.map(slot =>
-      slot.id === id ? { ...slot, [field]: value } : slot
-    ))
-  }
 
   const validateForm = (): boolean => {
     setError('')
@@ -206,7 +201,6 @@ export function useScheduleForm() {
     addTimeSlots,
     addTimeSlotsWithMerge,
     removeTimeSlot,
-    updateTimeSlot,
     validateForm,
     submitForm,
     resetForm,

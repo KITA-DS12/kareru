@@ -15,7 +15,6 @@ export default function ScheduleForm() {
     addTimeSlots,
     addTimeSlotsWithMerge,
     removeTimeSlot,
-    updateTimeSlot,
     submitForm,
   } = useScheduleForm()
 

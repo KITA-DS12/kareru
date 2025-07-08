@@ -7,9 +7,9 @@ interface TimeSlotGridProps {
   weekDates: Date[]
   todayColumnIndex: number
   onSlotClick: (dayIndex: number, slotIndex: number) => void
-  onEventClick: (event: TimeSlot) => void
   hoveredEvent?: string | null
   onEventHover?: (eventId: string | null) => void
+  selectedSlots?: Array<{ dayIndex: number; slotIndex: number }>
 }
 
 export default function TimeSlotGrid({
@@ -17,9 +17,9 @@ export default function TimeSlotGrid({
   weekDates,
   todayColumnIndex,
   onSlotClick,
-  onEventClick,
   hoveredEvent,
-  onEventHover
+  onEventHover,
+  selectedSlots = []
 }: TimeSlotGridProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const weekdays = ['日', '月', '火', '水', '木', '金', '土']
@@ -141,9 +141,11 @@ export default function TimeSlotGrid({
                   className={`calendar-time-slot h-8 border-r border-gray-700 cursor-pointer relative group transition-colors ${
                     slot.minute === 0 ? 'border-b border-gray-600' : 'border-b border-gray-800'
                   } ${
-                    todayColumnIndex === dayIndex 
-                      ? 'bg-gray-800 hover:bg-gray-700' 
-                      : 'hover:bg-gray-800'
+                    selectedSlots.some(s => s.dayIndex === dayIndex && s.slotIndex === slotIndex)
+                      ? 'bg-green-600 hover:bg-green-700'
+                      : todayColumnIndex === dayIndex 
+                        ? 'bg-gray-800 hover:bg-gray-700' 
+                        : 'hover:bg-gray-800'
                   }`}
                   onClick={() => onSlotClick(dayIndex, slotIndex)}
                 >
@@ -198,7 +200,6 @@ export default function TimeSlotGrid({
                       }}
                       onClick={(e) => {
                         e.stopPropagation()
-                        onEventClick(event)
                       }}
                       onMouseEnter={() => onEventHover?.(event.id || null)}
                       onMouseLeave={() => onEventHover?.(null)}

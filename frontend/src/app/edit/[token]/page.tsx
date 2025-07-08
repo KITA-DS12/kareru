@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { getScheduleByToken, updateSchedule } from '../../../services/api'
+import { getScheduleByToken } from '../../../services/api'
 import { Schedule, TimeSlot } from '../../../types/schedule'
 import { validateEditURL } from '../../../utils/url-validation'
 import { notFound } from 'next/navigation'
@@ -51,24 +51,8 @@ export default function EditPage({ params }: Props) {
   }, [params.token])
 
   const handleSave = async () => {
-    if (!schedule) return
-
-    try {
-      setSaving(true)
-      setError(null)
-      setSuccess(false)
-      await updateSchedule(params.token, {
-        comment,
-        timeSlots
-      })
-      setSuccess(true)
-      setTimeout(() => setSuccess(false), 3000)
-    } catch (error) {
-      console.error('Failed to update schedule:', error)
-      setError('更新に失敗しました')
-    } finally {
-      setSaving(false)
-    }
+    // 編集機能は削除されました
+    setError('編集機能は現在利用できません')
   }
 
   // カレンダーからの新しいタイムスロット作成
@@ -80,17 +64,6 @@ export default function EditPage({ params }: Props) {
     setTimeSlots(prev => [...prev, newSlot])
   }
 
-  // タイムスロットの更新
-  const handleUpdateTimeSlot = (id: string, updates: Partial<TimeSlot>) => {
-    setTimeSlots(prev => prev.map(slot => 
-      slot.id === id ? { ...slot, ...updates } : slot
-    ))
-  }
-
-  // タイムスロットの削除
-  const handleDeleteTimeSlot = (id: string) => {
-    setTimeSlots(prev => prev.filter(slot => slot.id !== id))
-  }
 
   if (loading) {
     return (
@@ -138,8 +111,6 @@ export default function EditPage({ params }: Props) {
                 expiresAt: schedule.expiresAt || ''
               }}
               onCreateTimeSlot={handleCreateTimeSlot}
-              onUpdateTimeSlot={handleUpdateTimeSlot}
-              onDeleteTimeSlot={handleDeleteTimeSlot}
               showWeekNavigation={true}
             />
           </div>
