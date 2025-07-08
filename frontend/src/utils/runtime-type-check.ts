@@ -54,10 +54,9 @@ export function isCreateScheduleResponse(data: unknown): data is CreateScheduleR
     isArray(data.timeSlots) &&
     data.timeSlots.every(slot => 
       isObject(slot) &&
-      isString(slot.id) &&
       isString(slot.StartTime) &&
       isString(slot.EndTime) &&
-      isBoolean(slot.Available)
+      (slot.Available === undefined || isBoolean(slot.Available))
     ) &&
     isString(data.createdAt) &&
     isString(data.expiresAt)
@@ -78,10 +77,9 @@ export function isSchedule(data: unknown): data is Schedule {
     isArray(data.timeSlots) &&
     data.timeSlots.every(slot => 
       isObject(slot) &&
-      isString(slot.id) &&
       isString(slot.StartTime) &&
       isString(slot.EndTime) &&
-      isBoolean(slot.Available)
+      (slot.Available === undefined || isBoolean(slot.Available))
     ) &&
     isString(data.createdAt) &&
     isString(data.expiresAt)
