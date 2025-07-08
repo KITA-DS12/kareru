@@ -39,7 +39,8 @@ jobs:
       
     - name: Start Firestore Emulator
       run: |
-        firebase emulators:start --only firestore --port 8081 &
+        firebase emulators:start --only firestore &
+        sleep 10
         echo "Waiting for Firestore emulator to be ready..."
         timeout 60 bash -c 'until nc -z localhost 8081; do sleep 2; done'
         echo "Firestore emulator is ready on localhost:8081"
