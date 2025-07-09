@@ -20,6 +20,7 @@ interface CalendarGridProps {
   onCreateTimeSlots?: (timeSlots: Array<Omit<TimeSlot, 'id'>>) => void
   onCreateTimeSlotsWithMerge?: (timeSlots: Array<Omit<TimeSlot, 'id'>>) => void
   onRemoveTimeSlot?: (id: string) => void
+  mode?: 'create' | 'edit' | 'view'
   showWeekNavigation?: boolean
 }
 
@@ -31,6 +32,7 @@ export default function CalendarGrid({
   onCreateTimeSlots,
   onCreateTimeSlotsWithMerge,
   onRemoveTimeSlot,
+  mode = 'create',
   showWeekNavigation = true
 }: CalendarGridProps) {
   const [hoveredEvent, setHoveredEvent] = useState<string | null>(null)
@@ -339,9 +341,10 @@ export default function CalendarGrid({
   }, [onCreateTimeSlot, onCreateTimeSlots, onCreateTimeSlotsWithMerge, weekDates, durationMode, getDurationSlots])
   
   const handleTimeSlotClick = useCallback((timeSlot: TimeSlot) => {
+    if (mode === 'view') return
     setSelectedTimeSlot(timeSlot)
     setDeleteModalOpen(true)
-  }, [])
+  }, [mode])
   
   const handleDeleteTimeSlot = useCallback((id: string) => {
     onRemoveTimeSlot?.(id)
