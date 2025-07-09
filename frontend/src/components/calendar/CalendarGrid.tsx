@@ -7,6 +7,7 @@ import {
 import WeekNavigation from './WeekNavigation'
 import DurationSelector from './DurationSelector'
 import TimeSlotGrid from './TimeSlotGrid'
+import DeleteTimeSlotModal from './DeleteTimeSlotModal'
 import useTimeSlotManagement from '../../hooks/useTimeSlotManagement'
 import useCalendarNavigation from '../../hooks/useCalendarNavigation'
 
@@ -18,6 +19,8 @@ interface CalendarGridProps {
   onCreateTimeSlot?: (timeSlot: Omit<TimeSlot, 'id'>) => void
   onCreateTimeSlots?: (timeSlots: Array<Omit<TimeSlot, 'id'>>) => void
   onCreateTimeSlotsWithMerge?: (timeSlots: Array<Omit<TimeSlot, 'id'>>) => void
+  onRemoveTimeSlot?: (id: string) => void
+  mode?: 'create' | 'edit' | 'view'
   showWeekNavigation?: boolean
 }
 
@@ -28,12 +31,16 @@ export default function CalendarGrid({
   onCreateTimeSlot,
   onCreateTimeSlots,
   onCreateTimeSlotsWithMerge,
+  onRemoveTimeSlot,
+  mode = 'create',
   showWeekNavigation = true
 }: CalendarGridProps) {
   const [hoveredEvent, setHoveredEvent] = useState<string | null>(null)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const [durationMode, setDurationMode] = useState<DurationMode>('30min')
   const [selectedSlots, setSelectedSlots] = useState<Array<{ dayIndex: number; slotIndex: number }>>([])
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false)
+  const [selectedTimeSlot, setSelectedTimeSlot] = useState<TimeSlot | null>(null)
   
   // カレンダーナビゲーション管理フック
   const {
@@ -333,6 +340,23 @@ export default function CalendarGrid({
     }
   }, [onCreateTimeSlot, onCreateTimeSlots, onCreateTimeSlotsWithMerge, weekDates, durationMode, getDurationSlots])
   
+  const handleTimeSlotClick = useCallback((timeSlot: TimeSlot) => {
+    if (mode === 'view') return
+    setSelectedTimeSlot(timeSlot)
+    setDeleteModalOpen(true)
+  }, [mode])
+  
+  const handleDeleteTimeSlot = useCallback((id: string) => {
+    onRemoveTimeSlot?.(id)
+    setDeleteModalOpen(false)
+    setSelectedTimeSlot(null)
+  }, [onRemoveTimeSlot])
+  
+  const handleCloseModal = useCallback(() => {
+    setDeleteModalOpen(false)
+    setSelectedTimeSlot(null)
+  }, [])
+  
   // クライアントサイドでのみレンダリング
   if (!isClient) {
     return (
@@ -373,10 +397,21 @@ export default function CalendarGrid({
         weekDates={weekDates}
         todayColumnIndex={todayColumnIndex}
         onSlotClick={handleSlotClick}
+        onTimeSlotClick={handleTimeSlotClick}
         hoveredEvent={hoveredEvent}
         onEventHover={setHoveredEvent}
         selectedSlots={selectedSlots}
       />
+      
+      {/* 削除モーダル */}
+      {selectedTimeSlot && (
+        <DeleteTimeSlotModal
+          isOpen={deleteModalOpen}
+          timeSlot={selectedTimeSlot}
+          onDelete={handleDeleteTimeSlot}
+          onClose={handleCloseModal}
+        />
+      )}
     </div>
   )
 }

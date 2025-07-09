@@ -18,16 +18,16 @@ const mockSchedule: Schedule = {
 
 const mockOnRemoveTimeSlot = jest.fn()
 
-describe('CalendarGrid - 削除モーダル表示機能', () => {
+describe('CalendarGrid - スケジュール表示モードでの削除無効化', () => {
   beforeEach(() => {
     jest.clearAllMocks()
   })
 
-  it('イベントバークリック時に削除モーダルが表示される', async () => {
+  it('スケジュール表示モードでは削除モーダルが表示されない', async () => {
     render(
       <CalendarGrid
         schedule={mockSchedule}
-        onRemoveTimeSlot={mockOnRemoveTimeSlot}
+        mode="view"
       />
     )
 
@@ -40,35 +40,14 @@ describe('CalendarGrid - 削除モーダル表示機能', () => {
     const eventBars = screen.getAllByTestId(/event-bar-/)
     fireEvent.click(eventBars[0])
     
-    expect(screen.getByTestId('delete-modal')).toBeInTheDocument()
-  })
-
-  it('削除実行後にモーダルが閉じる', async () => {
-    render(
-      <CalendarGrid
-        schedule={mockSchedule}
-        onRemoveTimeSlot={mockOnRemoveTimeSlot}
-      />
-    )
-
-    await waitFor(() => {
-      const eventBars = screen.getAllByTestId(/event-bar-/)
-      expect(eventBars.length).toBeGreaterThan(0)
-    })
-    
-    const eventBars = screen.getAllByTestId(/event-bar-/)
-    fireEvent.click(eventBars[0])
-
-    const deleteButton = screen.getByText('削除')
-    fireEvent.click(deleteButton)
-
     expect(screen.queryByTestId('delete-modal')).not.toBeInTheDocument()
   })
 
-  it('削除実行後に該当タイムスロットが削除される', async () => {
+  it('作成モードでは削除モーダルが表示される', async () => {
     render(
       <CalendarGrid
         schedule={mockSchedule}
+        mode="create"
         onRemoveTimeSlot={mockOnRemoveTimeSlot}
       />
     )
@@ -80,14 +59,31 @@ describe('CalendarGrid - 削除モーダル表示機能', () => {
     
     const eventBars = screen.getAllByTestId(/event-bar-/)
     fireEvent.click(eventBars[0])
-
-    const deleteButton = screen.getByText('削除')
-    fireEvent.click(deleteButton)
-
-    expect(mockOnRemoveTimeSlot).toHaveBeenCalledWith('slot-1')
+    
+    expect(screen.getByTestId('delete-modal')).toBeInTheDocument()
   })
 
-  it('削除処理が既存のuseScheduleFormのremoveTimeSlot関数を呼び出す', async () => {
+  it('編集モードでは削除モーダルが表示される', async () => {
+    render(
+      <CalendarGrid
+        schedule={mockSchedule}
+        mode="edit"
+        onRemoveTimeSlot={mockOnRemoveTimeSlot}
+      />
+    )
+
+    await waitFor(() => {
+      const eventBars = screen.getAllByTestId(/event-bar-/)
+      expect(eventBars.length).toBeGreaterThan(0)
+    })
+    
+    const eventBars = screen.getAllByTestId(/event-bar-/)
+    fireEvent.click(eventBars[0])
+    
+    expect(screen.getByTestId('delete-modal')).toBeInTheDocument()
+  })
+
+  it('モードが未指定の場合は削除モーダルが表示される（デフォルト動作）', async () => {
     render(
       <CalendarGrid
         schedule={mockSchedule}
@@ -102,10 +98,7 @@ describe('CalendarGrid - 削除モーダル表示機能', () => {
     
     const eventBars = screen.getAllByTestId(/event-bar-/)
     fireEvent.click(eventBars[0])
-
-    const deleteButton = screen.getByText('削除')
-    fireEvent.click(deleteButton)
-
-    expect(mockOnRemoveTimeSlot).toHaveBeenCalledWith('slot-1')
+    
+    expect(screen.getByTestId('delete-modal')).toBeInTheDocument()
   })
 })

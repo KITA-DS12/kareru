@@ -7,6 +7,7 @@ interface TimeSlotGridProps {
   weekDates: Date[]
   todayColumnIndex: number
   onSlotClick: (dayIndex: number, slotIndex: number) => void
+  onTimeSlotClick?: (timeSlot: TimeSlot) => void
   hoveredEvent?: string | null
   onEventHover?: (eventId: string | null) => void
   selectedSlots?: Array<{ dayIndex: number; slotIndex: number }>
@@ -17,6 +18,7 @@ export default function TimeSlotGrid({
   weekDates,
   todayColumnIndex,
   onSlotClick,
+  onTimeSlotClick,
   hoveredEvent,
   onEventHover,
   selectedSlots = []
@@ -205,6 +207,7 @@ export default function TimeSlotGrid({
                       }}
                       onClick={(e) => {
                         e.stopPropagation()
+                        onTimeSlotClick?.(event)
                       }}
                       onMouseEnter={() => onEventHover?.(event.id || null)}
                       onMouseLeave={() => onEventHover?.(null)}
