@@ -50,7 +50,7 @@ export default function DeleteTimeSlotModal({
         className="bg-white rounded-lg p-6 max-w-md w-full mx-4 shadow-xl"
       >
         <h2 className="text-lg font-semibold mb-4">
-          {timeSlot.startTime}-{timeSlot.endTime}のタイムスロットを削除しますか？
+          {timeSlot.StartTime ? new Date(timeSlot.StartTime).toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit' }) : timeSlot.startTime}-{timeSlot.EndTime ? new Date(timeSlot.EndTime).toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit' }) : timeSlot.endTime}のタイムスロットを削除しますか？
         </h2>
         
         <div className="flex justify-end space-x-3">
